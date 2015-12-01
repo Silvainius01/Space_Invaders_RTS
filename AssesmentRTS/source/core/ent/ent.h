@@ -116,6 +116,7 @@ public:
 		setHP(10); setDMG(1); setSpeed(10);
 		setSprite(ui_Text); setID(-1);
 		setName("DEFAULT");
+		stopMoving(); setUnitCollision(false);
 	}
 	//Verbose constructor
 	Unit(int ID, char *name, unsigned sprt, int HP, int DMG, float spd, float ar, float as)
@@ -320,7 +321,7 @@ extern void selectEnts(float selbox[4]);
 
 //In entUnit.cpp
 
-extern void spawnUnit(Unit u, float x = getMouseX(), float y = getMouseY());
+extern void spawnUnit(Unit u, float x = getMouseX(), float y = getMouseY(), float tx = 0, float ty = 0);
 extern void updateEnts();
 extern bool selectUnits( float selbox[4]);
 extern void moveSelectedUnits();

@@ -22,21 +22,21 @@ void debugGameMode()
 		first = false;
 	}
 
-	int key = checkBindings();
+	/*int key = checkBindings();*/
 	int mouse = checkMouse();
 
-	if (key == KEY_I) { spawnUnit(u_Invader); }
+	/*if (key == KEY_I) { spawnUnit(u_Invader); }
 	if (key == KEY_H)  { spawnUnit(u_Human); }
 	
-	/*if (key == KEY_B) { spawnBuild(b_HumanBarracks); }
+	if (key == KEY_B) { spawnBuild(b_HumanBarracks); }
 	if (key == KEY_T) { spawnBuild(b_HumanTower); }
 	if (key == KEY_C) { spawnBuild(b_HumanTC); }
 
 	if (key == SHF_B) { spawnBuild(b_InvaderBarracks); }
 	if (key == SHF_T) { spawnBuild(b_InvaderTower); }
-	if (key == SHF_C) { spawnBuild(b_InvaderTC); }*/
+	if (key == SHF_C) { spawnBuild(b_InvaderTC); }
 	
-	if (key == KEY_BACKSPACE) { killUnits(); /*killBuild();*/ }
+	if (key == KEY_BACKSPACE) { killUnits(); killBuild(); }*/
 	
 	if (mouse == MOUSE_BUTTON_LEFT)
 	{
@@ -145,10 +145,15 @@ void main()
 	initUI();
 	initEnts();
 
+	float tempTimer = 0.0f;
+
 	while (stepContext())
 	{
 		if (isUserInMenu) { debugMenuMode(); }
-		else { debugGameMode(); updateEnts(); }
+		else 
+		{ 
+			debugGameMode(); updateEnts(); ai_Run();
+		}
 
 		drawMouse();
 	}

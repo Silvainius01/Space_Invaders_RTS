@@ -81,7 +81,7 @@ float getUnitH(Unit &u)
 	}
 }
 
-void spawnUnit(Unit u, float x, float y)
+void spawnUnit(Unit u, float x, float y, float tx, float ty)
 {
 	bool isIndexOpen = false;
 	int openIndex;
@@ -98,7 +98,6 @@ void spawnUnit(Unit u, float x, float y)
 
 	if (!isIndexOpen)
 	{
-		cout << "True;";
 		Unit *temp = new Unit[unitSpawnIndex];
 		for (int a = 0; a < unitSpawnIndex; a++) { temp[a] = u_Current; }
 		openIndex = unitSpawnIndex;
@@ -109,6 +108,7 @@ void spawnUnit(Unit u, float x, float y)
 		delete[]temp;
 	}
 
+	if (tx != 0 && ty != 0) { u.setTargetCoords(tx, ty); }
 	u.setPosDim({ x, y, getUnitH(u), getUnitW(u) });
 	u_AllDynam[openIndex] = u;
 }

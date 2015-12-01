@@ -74,31 +74,32 @@ float getBuildH(Building &b)
 
 void checkForTargets(Building &b)
 {
-	float dist;
-	float comp = 900000;
-	int closest;
-	bool inited = false;
+	float dist = xSpace(101);
+	float comp = xSpace(101);
 	PosDim unitPD;
+	PosDim closest;
 	PosDim buildPD = b.getPosDim();
 
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader || u_Current == u_Empty) { continue; }
+		if (u_Current == u_Empty) { continue; }
+		if (b == b_InvaderTower && u_Current == u_Invader) { continue; } 
+		if (b == b_HumanTower && u_Current == u_Human) { continue; } 
+
 		else
 		{
 			unitPD = u_Current.getPosDim();
 			dist = sqrt(expo<float>(abs(buildPD.x - unitPD.x), 2) + expo<float>(abs(buildPD.y - unitPD.y), 2));
-			if (dist < comp) { comp = dist; }
+			if (dist < comp) { comp = dist; closest = unitPD; }
 		}
 	}
 
 	if (comp < b.getAtkRad())
 	{
-		cout << b.getAtkSpeed() << ", " << b.getLastAtk() << endl;
 		if (b.getLastAtk() >= b.getAtkSpeed())
 		{
 			b.setLastAtk(0.0f);
-			spawnBullet(b, unitPD.x, unitPD.y);
+			spawnBullet(b, closest.x, closest.y);
 		}
 		else
 		{
@@ -171,21 +172,13 @@ void updateQueue(Building &b)
 
 	if (b == b_HumanBarracks)
 	{
-		for (int a = 0; a < unitSpawnIndex; a++)
-		{
-			if (u_Current == u_Human) { trainTime += 0.25f; }
-		}
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Human) { trainTime += 0.25f; } }
 	}
 	else if (b == b_InvaderBarracks)
 	{
-		for (int a = 0; a < unitSpawnIndex; a++)
-		{
-			if (u_Current == u_Invader) { trainTime += 0.25f; }
-		}
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader) { trainTime += 0.25f; } }
 	}
 	else { return; }
-
-	cout << b.getElapsedTrainTime() << endl;
 
 	if (b.getElapsedTrainTime() >= trainTime)
 	{
@@ -193,10 +186,10 @@ void updateQueue(Building &b)
 		switch (b.queue[0])
 		{
 		case 0:
-			spawnUnit(u_Human, pd.x, pd.y - pd.h);
+			spawnUnit(u_Human, pd.x, pd.y - pd.h, xSpace(25), ySpace(75));
 			break;
 		case 1:
-			spawnUnit(u_Invader, pd.x, pd.y - pd.h);
+			spawnUnit(u_Invader, pd.x, pd.y + pd.h + xSpace(1), xSpace(75), ySpace(45));
 			break;
 		}
 

@@ -3,6 +3,10 @@
 #include <cstring>
 using namespace sfw;
 
+#define PRINT cout <<
+#define _ << ", " <<
+#define NL << endl
+
 enum TextAlign
 {
 	CENTER = 0,

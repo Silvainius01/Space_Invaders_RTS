@@ -1,5 +1,5 @@
 #include "ent.h"
-#include "math.h"
+#include "../math.h"
 #include "../ui/input.h"
 #include "../ui/ui.h"
 using namespace std;
@@ -46,10 +46,10 @@ void initEnts()
 	blt_AllDynam = new Bullet[bulletSpawnIndex];
 	blt_AllDynam[0] = blt_Empty;
 
-	blt_Human = Bullet(0, 50.0f, u_Human.getDMG());
-	blt_Invader = Bullet(1, 50.0f, u_Invader.getDMG());
-	blt_HumanTower = Bullet(2, 60, b_HumanTower.getDMG());
-	blt_InvaderTower = Bullet(3, 60, b_InvaderTower.getDMG());
+	blt_Human		= Bullet(0, 75.0f, u_Human.getDMG());
+	blt_Invader		= Bullet(1, 75.0f, u_Invader.getDMG());
+	blt_HumanTower	= Bullet(2, 100.0f, b_HumanTower.getDMG());
+	blt_InvaderTower= Bullet(3, 100.0f, b_InvaderTower.getDMG());
 }
 
 void checkCollision(Unit &u, int index, bool isBuild = false)
@@ -131,19 +131,19 @@ void checkCollision(Unit &u, int index, bool isBuild = false)
 }
 void getCollisionCandidates(Unit &u)
 {
-	//const float step = PI / 12;
-	const float r = u.getAtkRad();
+	const float r = u.getAtkRad() / 2;
+	float dist;
 	bool checkBuilds = false;
 	int spawnIndex = unitSpawnIndex;
 	PosDim rupd = u.getPosDim();
 	PosDim ucpd;
 
-	if (rupd.x + (rupd.h / 2) > xSpace(79) - (b_InvaderTower.getPosDim().w / 2) && rupd.y - (rupd.h / 2) < ySpace(41) + (b_InvaderTower.getPosDim().h / 2))
+	if (rupd.x + (rupd.h / 2) >= xSpace(79) - (wi_Tower / 2) && rupd.y - (rupd.h / 2) <= ySpace(41) + (hi_Tower / 2))
 	{ 
 		checkBuilds = true;
 		spawnIndex = buildSpawnIndex;
 	}
-	else if (rupd.x < xSpace(20) + (b_HumanTower.getPosDim().w / 2) && rupd.y > ySpace(80) + (b_HumanTower.getPosDim().h / 2))
+	else if (rupd.x <= xSpace(21) + (wi_Tower / 2) && rupd.y >= ySpace(79) - (hi_Tower / 2))
 	{ 
 		checkBuilds = true; 
 		spawnIndex = buildSpawnIndex;
@@ -153,18 +153,14 @@ void getCollisionCandidates(Unit &u)
 	{
 		if (checkBuilds) { ucpd = b_Current.getPosDim(); }
 		else { ucpd = u_Current.getPosDim(); }
-
 		if (u_Current == u_Empty || rupd == ucpd) { continue; }
-		else
+
+		dist = sqrt(expo<float>(abs(rupd.x - ucpd.x), 2) + expo<float>(abs(rupd.y - ucpd.y), 2));
+
+		if (dist <= r)
 		{
-			if (ucpd.x >= rupd.x - r && ucpd.x <= rupd.x + r)
-			{
-				if (ucpd.y >= rupd.y - r && ucpd.y <= rupd.y + r)
-				{
-					if(checkBuilds) { checkCollision(u, a, true); }
-					else { checkCollision(u, a); }
-				}
-			}
+			if (checkBuilds) { checkCollision(u, a, true); }
+			else { checkCollision(u, a); }
 		}
 	}
 }
@@ -237,7 +233,7 @@ void updateEnts()
 
 		_pd = blt_Current.getPosDim();
 
-		drawCircle(_pd.x, _pd.y, ySpace(1));
+		drawCircle(_pd.x, _pd.y, 2);
 
 		if (_pd.x != blt_Current.getTargetX() && _pd.y != blt_Current.getTargetY())
 		{
@@ -254,6 +250,8 @@ void selectEnts(float selbox[4])
 	int save;
 	bool isShiftPressed = false;
 	bool gotUnit = false;
+	bool gotPlayerUnit = false;
+	bool gotPlayerBuild = false;
 
 	if (checkBindings(true) == KEY_LSHIFT) { isShiftPressed = true; }
 
@@ -279,38 +277,44 @@ void selectEnts(float selbox[4])
 	{
 		pd = u_Current.getPosDim();
 
+		if (u_Current == u_Invader && gotPlayerUnit) { u_Current.setSelected(false); continue; }
 
 		if (pd.y + pd.h >= selbox[1] && pd.y <= selbox[1] + selbox[2])
 		{
 			if (pd.x <= selbox[0] + selbox[3] && pd.x + pd.w >= selbox[0])
 			{
 				u_Current.setSelected(true);
+				if (u_Current == u_Human && !gotPlayerUnit) 
+				{ 
+					gotPlayerUnit = true;
+					for (int b = a; b != -1; b--) { if (u_AllDynam[b] == u_Invader) { u_AllDynam[b].setSelected(false); } }
+				}
 				gotUnit = true;
 			}
 			else if (!isShiftPressed) { u_Current.setSelected(false); }
 		}
 		else if (!isShiftPressed) { u_Current.setSelected(false); }
+	}
 
-		if (a == unitSpawnIndex - 1)
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		if (gotUnit) { b_Current.setSelected(false); continue; }
+		if (b_Current == b_InvaderBarracks || b_Current == b_InvaderTC || b_Current == b_InvaderTower)
 		{
-			save = a;
-			for (a = 0; a < buildSpawnIndex; a++)
-			{
-				if (gotUnit) { b_Current.setSelected(false); continue; }
-
-				pd = b_Current.getPosDim();
-
-				if (pd.y + pd.h >= selbox[1] && pd.y <= selbox[1] + selbox[2])
-				{
-					if (pd.x <= selbox[0] + selbox[3] && pd.x + pd.w >= selbox[0])
-					{
-						b_Current.setSelected(true);
-					}
-					else if (!isShiftPressed) { b_Current.setSelected(false); }
-				}
-				else if (!isShiftPressed) { b_Current.setSelected(false); }
-			}
-			a = save;
+			if (gotPlayerBuild) { b_Current.setSelected(false); continue; }
 		}
+
+		pd = b_Current.getPosDim();
+
+		if (pd.y + pd.h >= selbox[1] && pd.y <= selbox[1] + selbox[2])
+		{
+			if (pd.x <= selbox[0] + selbox[3] && pd.x + pd.w >= selbox[0])
+			{
+				b_Current.setSelected(true);
+				if (b_Current == b_HumanTC || b_Current == b_HumanBarracks || b_Current == b_HumanTower) { gotPlayerBuild = true; }
+			}
+			else if (!isShiftPressed) { b_Current.setSelected(false); }
+		}
+		else if (!isShiftPressed) { b_Current.setSelected(false); }
 	}
 }
