@@ -17,7 +17,9 @@ int idleUnits;
 int unitAttackers;
 int buildAttackers;
 int trainingUnits;
+int minUnits = 10;
 
+int tmr_Count = 0;
 float tmr_Update = 0.0f;
 
 //Start training a certain number of units, will change based on availble room.
@@ -235,10 +237,13 @@ void ai_SUTFUT(const int numUnits, UnitTask doThis, UnitTask notThis)
 		
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current.getTarget() == task)
+		if (u_Current == u_Invader)
 		{
-			u_Current.setTarget(task2);
-			b--;
+			if (u_Current.getTarget() == task)
+			{
+				u_Current.setTarget(task2);
+				b--;
+			}
 		}
 	}
 }
@@ -262,47 +267,61 @@ void ai_Run(float updateTime)
 
 	if (tmr_Update >= updateTime)
 	{
+		int tempCount = 0;
+
 		tmr_Update = 0.0f;
+		tmr_Count++;
 
 		playerUnits = ai_CPU();
-		playerUnitsNearMe = ai_CPUNB(false);
+		//playerUnitsNearMe = ai_CPUNB(false);
 		attackingPlayerUnits = ai_CPUNB(true);
 		units = ai_CU();
 		idleUnits = ai_CUDT(IDLE);
 		unitAttackers = ai_CUDT(FIGHT_UNITS);
-		buildAttackers = ai_CUDT(FIGHT_BUILDS);
+		//buildAttackers = ai_CUDT(FIGHT_BUILDS);
 		trainingUnits = ai_CUIT();
+
+		if (playerUnits <= 12) { minUnits = 10; }
+		else if (playerUnits > 12 && playerUnits < 18) { minUnits = 15; }
+		else if (playerUnits >= 18) { minUnits = 25; }
+
+		if (tmr_Count == 5) { for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader) { u_Current.setTarget(NOTHING); } } tmr_Count = 0; }
+
+		//AI immeadiatly trains 10 units
+		if (units == 0 && trainingUnits == 0) { ai_QU(7); ai_QU(8); return; }
+		//AI always has three units on guard!!
+		if (units >= 3 && unitAttackers < 3)
+		{
+			switch (unitAttackers)
+			{
+			case 0: ai_SUT(3, FIGHT_UNITS); break;
+			case 1: ai_SUT(2, FIGHT_UNITS); break;
+			case 2: ai_SUT(1, FIGHT_UNITS); break;
+			}
+		}
+		//AI maks sure that it always has the desired minimum units out or coming out
+		if (units + trainingUnits < minUnits)
+		{
+			int train = minUnits - units - trainingUnits;
+			for (int a = 0; a < train; a++) { ai_QU(1); }
+		}
+
+		//If the AI thinks it has enough units, make extra guardes and send an attack party
+		if (unitAttackers < (units / 2))
+		{
+			tempCount = 0;
+			for (int a = 0; a < (units / 2) - unitAttackers; a++) { ai_SUT(1, FIGHT_UNITS); tempCount++; }
+		}
+		if (idleUnits - tempCount > 5) { ai_SUTFUT(idleUnits - tempCount, FIGHT_BUILDS, IDLE); }
+
+
+		if (playerUnits < playerUnits + (unitAttackers * 0.5))
+		{
+			tempCount = 0;
+			ai_SUT(units, FIGHT_BUILDS);
+			ai_SUT(playerUnits + (unitAttackers * 0.5));
+		}
 	}
 	else { tmr_Update += getDeltaTime(); }
 
-	//AI immeadiatly trains 10 units
-	if (units == 0 && trainingUnits == 0) { ai_QU(7); ai_QU(8); return; }
-	//AI always has three units on guard!!
-	if (units >= 3 && unitAttackers < 3)
-	{
-		switch (unitAttackers)
-		{
-		case 0: ai_SUT(3, FIGHT_UNITS); break;
-		case 1: ai_SUT(2, FIGHT_UNITS); break;
-		case 2: ai_SUT(1, FIGHT_UNITS); break;
-		}
-	}
-	//AI maks sure that it has 10 units always out or coming out
-	else if (units < 5 && trainingUnits < 5)
-	{
-		int train = 10 - units - trainingUnits;
-		for (int a = 0; a < train; a++) { ai_QU(1); }
-	}
-	//If the AI thinks it has enough units, make extra guardes and send an attack party
-	else if (units > 10)
-	{
-		if (unitAttackers < 5)
-		{
-			for (int a = 0; a < 5 - unitAttackers; a++) { ai_SUTFUT(1, FIGHT_UNITS, IDLE); }
-		}
-		if (idleUnits > 5)
-		{
-			ai_SUTFUT(3, FIGHT_BUILDS, IDLE);
-		}
-	}
 }

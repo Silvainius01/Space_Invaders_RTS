@@ -1,26 +1,9 @@
-﻿Build started 12/1/2015 1:13:30 AM.
+﻿Build started 12/1/2015 9:46:22 AM.
      1>Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\Game\AI.cpp source\core\ent\entUnit.cpp source\core\main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\Game\AI.cpp
          AI.cpp
      1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(283): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-         Generating Code...
-         Compiling...
-         entUnit.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(283): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(62): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(63): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(78): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(79): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(153): warning C4390: ';': empty controlled statement found; is this the intent?
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\entunit.cpp(273): warning C4390: ';': empty controlled statement found; is this the intent?
-         Generating Code...
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\math.h(26): warning C4715: 'expo<float>': not all control paths return a value
-         Compiling...
-         main.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(283): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\main.cpp(144): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
-         Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Programming\School\Assesments\AssesmentRTS\Debug\AssesmentRTS.exe" /INCREMENTAL /NOLOGO ./source/core/libraries/sfw_d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\Programming\School\Assesments\AssesmentRTS\Debug\AssesmentRTS.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Programming\School\Assesments\AssesmentRTS\Debug\AssesmentRTS.lib" /MACHINE:X86 Debug\ent.obj
          Debug\entBuild.obj
@@ -36,24 +19,9 @@
          Debug\overlay.obj
          Debug\ui.obj
          source\core\libraries\sfw.lib
-     1>sfw_d.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw_d.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\nsfw2draw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(crenderutils.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw_d.lib(crenderutils.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\nsfw2draw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw_d.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\nsfw2draw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(wgl_context.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(wgl_context.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(winmm_joystick.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(winmm_joystick.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(win32_window.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(win32_window.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(win32_tls.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(win32_tls.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(win32_time.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(win32_time.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(win32_monitor.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(win32_monitor.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(win32_init.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(win32_init.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(window.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(window.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(monitor.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(monitor.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(input.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(input.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(init.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(init.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
-     1>sfw_d.lib(context.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'sfw_d.lib(context.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Debug\glfw.pdb'; linking object as if no debug info
          AssesmentRTS.vcxproj -> D:\Programming\School\Assesments\AssesmentRTS\Debug\AssesmentRTS.exe
      1>Done Building Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:05.32
+Time Elapsed 00:00:03.27
