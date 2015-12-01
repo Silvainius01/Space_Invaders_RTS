@@ -319,7 +319,7 @@ void ai_Run(float updateTime)
 		{
 			tempCount = 0;
 			ai_SUT(units, FIGHT_BUILDS);
-			ai_SUT(playerUnits + (unitAttackers * 0.5));
+			ai_SUT(playerUnits + (unitAttackers * 0.5), FIGHT_UNITS);
 		}
 	}
 	else { tmr_Update += getDeltaTime(); }

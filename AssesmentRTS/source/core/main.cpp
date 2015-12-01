@@ -14,6 +14,22 @@ bool isUserInMenu = true;
 bool first = true;
 float x, y;
 
+int checkEndConds()
+{
+	bool flagHTC = false;
+	bool flagITC = false;
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		if (b_Current == b_HumanTC) { flagHTC = true; }
+		if (b_Current == b_InvaderTC) { flagITC = true; }
+
+		if (flagHTC && !flagITC) { m_End[1].setName("You Win"); return 0; }
+		if (!flagHTC && flagITC) { return 1; }
+		else { return -1; }
+	}
+}
+
 void debugGameMode()
 {
 	if (first)
@@ -150,9 +166,18 @@ void main()
 	while (stepContext())
 	{
 		if (isUserInMenu) { debugMenuMode(); }
-		else 
+		else
 		{ 
-			debugGameMode(); updateEnts(); ai_Run();
+			switch(checkEndConds())
+			{
+			case -1: debugGameMode(); updateEnts(); ai_Run(); break;
+			default: 
+				if (drawMenu(m_End) == 2)
+				{
+					isUserInMenu = true;
+					m_CurrentMenu = MAIN;
+				}
+			}
 		}
 
 		drawMouse();

@@ -81,6 +81,7 @@ extern Button m_Optn[7];
 extern Button m_Ctrl[5];
 extern Button m_Scrn[5];
 extern Button m_Clr[11];
+extern Button m_End[3];
 
 
 extern bool isUnitOnOverlay;

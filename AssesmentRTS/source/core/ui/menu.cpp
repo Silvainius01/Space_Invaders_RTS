@@ -69,6 +69,9 @@ Button m_Clr[11] = {Button("COLOR", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER,
 					Button("WHITE", xSpace(75), ySpace(30), 3, 3),
 					Button("BACK", xSpace(50), ySpace(10), 3, 3), Button() };
 
+Button m_End[3] = { Button("You Lost", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+					Button("Main Menu", xSpace(50), ySpace(60), 3, 3), Button() };
+
 int drawMenu(Button *b, int indexLimiter)
 {
 	int choice = -1;
