@@ -1,0 +1,89 @@
+﻿Build started 11/30/2015 10:26:44 AM.
+     1>Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" on node 2 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\ent\ent.cpp source\core\ent\entBuild.cpp source\core\ent\entBullet.cpp source\core\ent\entUnit.cpp source\core\fileio\save.cpp source\core\Game\AI.cpp source\core\Game\Generate.cpp source\core\main.cpp source\core\MATH.cpp source\core\ui\input.cpp source\core\ui\menu.cpp source\core\ui\overlay.cpp source\core\ui\ui.cpp
+         ent.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ent\ent.cpp(49): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ent\ent.cpp(50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ent\ent.cpp(51): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ent\ent.cpp(52): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+         entBuild.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ent\entBuild.cpp(42): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entBuild.cpp(43): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entBuild.cpp(44): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entBuild.cpp(64): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entBuild.cpp(65): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entBuild.cpp(66): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+         entBullet.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+         entUnit.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\./ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ent\entUnit.cpp(62): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entUnit.cpp(63): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entUnit.cpp(78): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entUnit.cpp(79): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\ent\entUnit.cpp(137): warning C4305: 'initializing': truncation from 'double' to 'float'
+     1>source\core\ent\entUnit.cpp(158): warning C4305: '=': truncation from 'double' to 'float'
+     1>source\core\ent\entUnit.cpp(254): warning C4305: 'initializing': truncation from 'double' to 'float'
+     1>source\core\ent\entUnit.cpp(283): warning C4305: '=': truncation from 'double' to 'float'
+         save.cpp
+         AI.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+         Generate.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+         main.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\./ent/ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\main.cpp(144): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+         MATH.cpp
+         input.cpp
+     1>source\core\ui\input.cpp(1): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+         menu.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\menu.cpp(83): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\menu.cpp(91): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\menu.cpp(138): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+         overlay.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(275): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\overlay.cpp(17): warning C4018: '<': signed/unsigned mismatch
+         ui.cpp
+     1>source\core\ui\ui.cpp(132): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\ui.cpp(133): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ui\ui.cpp(144): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\ui.cpp(152): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ui\ui.cpp(154): warning C4018: '<': signed/unsigned mismatch
+     1>source\core\ui\ui.cpp(168): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\ui.cpp(174): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\ui.cpp(187): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>source\core\ui\ui.cpp(199): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe" /NOLOGO ./source/core/libraries/sfw.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.pdb" /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.lib" /MACHINE:X86 /SAFESEH Release\ent.obj
+         Release\entBuild.obj
+         Release\entBullet.obj
+         Release\entUnit.obj
+         Release\save.obj
+         Release\AI.obj
+         Release\Generate.obj
+         Release\main.obj
+         Release\MATH.obj
+         Release\input.obj
+         Release\menu.obj
+         Release\overlay.obj
+         Release\ui.obj
+         source\core\libraries\sfw.lib
+         Generating code
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\ui.cpp(49): warning C4715: 'itc': not all control paths return a value
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\menu.cpp(162): warning C4715: 'getSelectedColor': not all control paths return a value
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\math.h(26): warning C4715: 'expo<float>': not all control paths return a value
+         All 787 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+         Finished generating code
+     1>sfw.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+     1>sfw.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+     1>sfw.lib(crenderutils.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(crenderutils.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+         AssesmentRTS.vcxproj -> D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe
+     1>Done Building Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:51.69
