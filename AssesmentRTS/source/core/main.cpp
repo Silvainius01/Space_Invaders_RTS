@@ -167,14 +167,21 @@ void main()
 	{
 		if (isUserInMenu) { debugMenuMode(); }
 		else
-		{ 
-			switch(checkEndConds())
+		{
+			switch (checkEndConds())
 			{
 			case -1: debugGameMode(); updateEnts(); ai_Run(); break;
-			default: 
+			default:
 				if (drawMenu(m_End) == 2)
 				{
 					isUserInMenu = true;
+					first = true;
+					for(int a = 0; a < unitSpawnIndex; a++)
+					{
+						u_Current = u_Empty;
+					}
+					unitSpawnIndex = 0; 
+					spawnUnit(u_Empty);
 					m_CurrentMenu = MAIN;
 				}
 			}

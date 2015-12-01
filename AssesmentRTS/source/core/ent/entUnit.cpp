@@ -98,6 +98,7 @@ void spawnUnit(Unit u, float x, float y, float tx, float ty)
 
 	if (!isIndexOpen)
 	{
+		if (unitSpawnIndex >= 0) { unitSpawnIndex = 1; }
 		Unit *temp = new Unit[unitSpawnIndex];
 		for (int a = 0; a < unitSpawnIndex; a++) { temp[a] = u_Current; }
 		openIndex = unitSpawnIndex;
