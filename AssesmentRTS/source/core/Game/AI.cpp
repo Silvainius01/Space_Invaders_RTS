@@ -1,14 +1,17 @@
 #include "../ent/ent.h"
 #include "../math.h"
+#include "../ui/ui.h"
+#include "../Game/game.h"
 
 enum UnitTask
 {
-	COUNT = -1,
 	IDLE = 0,
 	FIGHT_UNITS = 1,
 	FIGHT_BUILDS = 2
 };
 
+int tempCount = 0;
+int money;
 int playerUnits;
 int playerUnitsNearMe;
 int attackingPlayerUnits;
@@ -18,43 +21,12 @@ int unitAttackers;
 int buildAttackers;
 int trainingUnits;
 int minUnits = 10;
+int barracks;
+int towers;
 
 int tmr_Count = 0;
-float tmr_Update = 0.0f;
-
-//Start training a certain number of units, will change based on availble room.
-void ai_QU(int numUnits)
-{
-	int targetBarrack;
-	int comp = 11;
-
-	//This loop finds the barrack with the least units in its queue
-	for (int a = 0; a < buildSpawnIndex; a++)
-	{
-		int unitsInQ = 0;
-
-		if (b_Current == b_InvaderBarracks)
-		{
-			for (int b = 0; b < 10; b++)
-			{
-				if (b_Current.queue[b] != -1) { unitsInQ++; }
-			}
-
-			if (unitsInQ < comp)
-			{
-				comp = unitsInQ;
-				targetBarrack = a;
-			}
-		}
-	}
-
-	for (; comp + numUnits > 10; numUnits--); //This reduces the added units to fit the queue
-
-	for (int a = comp; a < comp + numUnits; a++)
-	{
-		b_AllDynam[targetBarrack].queue[a] = u_Invader.getID();
-	}
-}
+float ai_TimerStart = 0.0f;
+float tmr_Update = ai_TimerStart;
 
 //Counts all AI units
 int ai_CU()
@@ -74,14 +46,12 @@ int ai_CUDT(UnitTask ut)
 	int count = 0;
 	switch (ut)
 	{
-	case COUNT:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader) { count++; } } break;
 	case IDLE:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getTarget() == NOTHING) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == NOTHING) { count++; } } break;
 	case FIGHT_UNITS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getTarget() == UNITS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == UNITS) { count++; } } break;
 	case FIGHT_BUILDS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getTarget() == BUILDINGS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == BUILDINGS) { count++; } } break;
 	}
 
 	return count;
@@ -114,7 +84,7 @@ int ai_CPUNB(bool countBuildingAttackers)
 		{
 			pd = u_Current.getPosDim();
 
-			if (pd.x > xSpace(65) && pd.y < 55)
+			if (pd.x > xSpace(65) && pd.y < ySpace(55))
 			{
 				if (countBuildingAttackers && u_Current.getTarget() == BUILDINGS) { count++; }
 				else { count++; }
@@ -172,6 +142,22 @@ int ai_CUIT()
 	return count;
 }
 
+//Counts its barracks
+int ai_CB()
+{
+	int count = 0;
+	for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current == b_InvaderBarracks) { count++; } }
+	return count;
+}
+
+//Counts its towers
+int ai_CT()
+{
+	int count = 0;
+	for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current == b_InvaderTower) { count++; } }
+	return count;
+}
+
 //sets number of units to a task, regardless of current task.
 void ai_SUT(const int numUnits, UnitTask task)
 {
@@ -184,13 +170,13 @@ void ai_SUT(const int numUnits, UnitTask task)
 			switch (task)
 			{
 			case FIGHT_UNITS:
-				u_Invader.setTarget(UNITS);
+				u_Current.setTarget(UNITS);
 				break;
 			case FIGHT_BUILDS:
-				u_Invader.setTarget(BUILDINGS);
+				u_Current.setTarget(BUILDINGS);
 				break;
 			default:
-				u_Invader.setTarget(NOTHING);
+				u_Current.setTarget(NOTHING);
 				break;
 			}
 			b--;
@@ -254,7 +240,7 @@ void ai_MU(const int numUnits, float tx, float ty)
 	for (int a = 0, b = numUnits; a < unitSpawnIndex; a++)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
-		if (u_Current == u_Invader)
+		if (u_Current == u_Invader && u_Current.getTarget() == NOTHING)
 		{
 			u_Current.setTargetCoords(tx, ty);
 			b--;
@@ -262,65 +248,117 @@ void ai_MU(const int numUnits, float tx, float ty)
 	}
 }
 
-void ai_Run(float updateTime)
+//Start training a certain number of units, will change based on availble room.
+void ai_QU(int numUnits)
+{
+	int targetBarrack;
+	int comp = 11;
+
+	//This loop finds the barrack with the least units in its queue
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int unitsInQ = 0;
+
+		if (b_Current == b_InvaderBarracks)
+		{
+			for (int b = 0; b < 10; b++)
+			{
+				if (b_Current.queue[b] != -1) { unitsInQ++; }
+			}
+
+			if (unitsInQ < comp)
+			{
+				comp = unitsInQ;
+				targetBarrack = a;
+			}
+		}
+	}
+
+	for (; comp + numUnits > 10; numUnits--); //This reduces the added units to fit the queue
+
+	for (int a = comp; a < comp + numUnits; a++)
+	{
+		b_AllDynam[targetBarrack].queue[a] = u_Invader.getID();
+	}
+}
+
+//Build a tower
+void ai_PT()
+{
+	int blerg;
+	for (int a = 0; a != 100; a++)
+	{
+		//ai_CPUIA();
+	}
+}
+
+//Build a barracks
+void ai_PB()
 {
 
+}
+
+void ai_CalcUnits()
+{
+	if (playerUnits <= 12) { minUnits = 10; }
+	else if (playerUnits > 12 && playerUnits < 18) { minUnits = 15; }
+	else if (playerUnits >= 18 && playerUnits <= 22) { minUnits = 20; }
+	else if (playerUnits > 22 && playerUnits <= 28) { minUnits = 30; }
+	else { minUnits = playerUnits + 5; }
+
+	if (units == 0 && trainingUnits == 0)
+	{
+		for (int a = 0; a < barracks; a++) { ai_QU(15 / barracks); }
+		return;
+	}
+
+	if (units + trainingUnits < minUnits)
+	{
+		int train = minUnits - units - trainingUnits;
+		for (int a = 0; a < barracks; a++) { ai_QU(train / barracks); }
+	}
+
+	if (playerUnits == 0) { ai_SUT(units, FIGHT_BUILDS); }
+	else if (playerUnits > 20 && playerUnits < 30) { ai_SUT(units, FIGHT_UNITS); }
+	else if (playerUnits >= 30) { ai_SUT(units, FIGHT_UNITS); }
+	else if (playerUnits < 10)
+	{
+		int set = frac<int>(units, 1, 3);
+		ai_SUT(units, FIGHT_BUILDS);
+		ai_SUT(set, FIGHT_UNITS);
+	}
+	else
+	{
+		ai_SUT(units, FIGHT_UNITS);
+		ai_SUT(units / 2, FIGHT_BUILDS);
+	}
+
+	ai_SUTFUT(idleUnits, FIGHT_UNITS, IDLE);
+}
+void ai_CalcBuilds()
+{
+
+}
+void ai_Run(float updateTime)
+{
 	if (tmr_Update >= updateTime)
 	{
-		int tempCount = 0;
+		money = p_AI.getMoney();
 
 		tmr_Update = 0.0f;
-		tmr_Count++;
 
 		playerUnits = ai_CPU();
-		//playerUnitsNearMe = ai_CPUNB(false);
+		playerUnitsNearMe = ai_CPUNB(false);
 		attackingPlayerUnits = ai_CPUNB(true);
 		units = ai_CU();
 		idleUnits = ai_CUDT(IDLE);
 		unitAttackers = ai_CUDT(FIGHT_UNITS);
-		//buildAttackers = ai_CUDT(FIGHT_BUILDS);
+		buildAttackers = ai_CUDT(FIGHT_BUILDS);
 		trainingUnits = ai_CUIT();
+		barracks = ai_CB();
+		towers = ai_CT();
 
-		if (playerUnits <= 12) { minUnits = 10; }
-		else if (playerUnits > 12 && playerUnits < 18) { minUnits = 15; }
-		else if (playerUnits >= 18) { minUnits = 25; }
-
-		if (tmr_Count == 5) { for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader) { u_Current.setTarget(NOTHING); } } tmr_Count = 0; }
-
-		//AI immeadiatly trains 10 units
-		if (units == 0 && trainingUnits == 0) { ai_QU(7); ai_QU(8); return; }
-		//AI always has three units on guard!!
-		if (units >= 3 && unitAttackers < 3)
-		{
-			switch (unitAttackers)
-			{
-			case 0: ai_SUT(3, FIGHT_UNITS); break;
-			case 1: ai_SUT(2, FIGHT_UNITS); break;
-			case 2: ai_SUT(1, FIGHT_UNITS); break;
-			}
-		}
-		//AI maks sure that it always has the desired minimum units out or coming out
-		if (units + trainingUnits < minUnits)
-		{
-			int train = minUnits - units - trainingUnits;
-			for (int a = 0; a < train; a++) { ai_QU(1); }
-		}
-
-		//If the AI thinks it has enough units, make extra guardes and send an attack party
-		if (unitAttackers < (units / 2))
-		{
-			tempCount = 0;
-			for (int a = 0; a < (units / 2) - unitAttackers; a++) { ai_SUT(1, FIGHT_UNITS); tempCount++; }
-		}
-		if (idleUnits - tempCount > 5) { ai_SUTFUT(idleUnits - tempCount, FIGHT_BUILDS, IDLE); }
-
-
-		if (playerUnits < playerUnits + (unitAttackers * 0.5))
-		{
-			tempCount = 0;
-			ai_SUT(units, FIGHT_BUILDS);
-			ai_SUT(playerUnits + (unitAttackers * 0.5), FIGHT_UNITS);
-		}
+		ai_CalcUnits();
 	}
 	else { tmr_Update += getDeltaTime(); }
 

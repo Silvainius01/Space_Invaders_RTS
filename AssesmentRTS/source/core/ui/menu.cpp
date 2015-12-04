@@ -13,9 +13,10 @@ float Button::getYPos() { return yPos; }
 float Button::getHeight() { return height; }
 float Button::getWidth() { return width; }
 bool  Button::isClickable() { return clickable; }
+bool Button::isButtonHighlighted() { return highlighted; }
 unsigned Button::getTint() { return tint; }
 
-void Button::setName(char *n) { string = n; }
+void Button::setName(char *n) { string = n; usesSprite = false; }
 void Button::setXPos(float x) { xPos = x; }
 void Button::setYPos(float y) { yPos = y; }
 void Button::setHeight(float h) { height = h; }
@@ -25,7 +26,8 @@ void Button::setDim(float h, float w) { setHeight(h), setWidth(w); }
 void Button::setPosDim(float x, float y, float h, float w) { setPos(x, y), setDim(h, w); }
 void Button::setAllign(TextAlign TA) { ta = TA; }
 void Button::setClickable(bool c) { clickable = c; }
-void Button::setTint(unsigned color) { tint = color; }
+void Button::setTint(unsigned color) { tint = color;}
+void Button::isHighlighted(bool ih) { highlighted = ih; }
 
 Menu m_CurrentMenu = MAIN;
 
@@ -107,13 +109,16 @@ int drawMenu(Button *b, int indexLimiter)
 				if (b[a].isClickable())
 				{
 					drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, MAGENTA);
+					b[a].isHighlighted(true);
 					if (checkMouse(false) == MOUSE_BUTTON_LEFT)
 					{
 						choice = a;
 					}
 				}
 			}
+			else { b[a].isHighlighted(false); }
 		}
+		else { b[a].isHighlighted(false); }
 
 		if (a == indexLimiter) { return choice; }
 	}

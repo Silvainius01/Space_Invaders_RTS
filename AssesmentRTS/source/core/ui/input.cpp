@@ -13,10 +13,10 @@ Left Ctrl, Right Ctrl (51, 52)
 U, D, L, R (53 - 56)
 Escape, Enter/Return, Tab, Backspace (56 - 59)
 */
-int keys[keyIndex] = { 65, KEY_B, KEY_C, 68, 69, 70, 71, KEY_H, KEY_I, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, KEY_T, 85, 86, 87, 88, 89, 90, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 61, 91, 93, 92, 59, 39, 44, 46, 47, 96, 32, KEY_LSHIFT, 344, 341, 345, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ESCAPE, KEY_ENTER, KEY_TAB, KEY_BACKSPACE };
+int keys[keyIndex] = { 65, KEY_B, KEY_C, 68, 69, 70, 71, KEY_H, KEY_I, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, KEY_T, 85, 86, 87, 88, 89, 90, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 61, 91, 93, 92, 59, 39, 44, 46, 47, 96, 32, KEY_LSHIFT, 344, KEY_LCTRL, KEY_RCTRL, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ESCAPE, KEY_ENTER, KEY_TAB, KEY_BACKSPACE };
 bool keyPress[keyIndex];
 
-int bindings[bindIndex] = { KEY_LSHIFT, KEY_I, KEY_H, KEY_BACKSPACE, KEY_B, KEY_C, KEY_T };
+int bindings[bindIndex] = { KEY_LSHIFT, KEY_I, KEY_H, KEY_BACKSPACE, KEY_B, KEY_C, KEY_T, KEY_RCTRL, KEY_LCTRL };
 bool bindPress[bindIndex];
 
 const int mouseIndex = 2;

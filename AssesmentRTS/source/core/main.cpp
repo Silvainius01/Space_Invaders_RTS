@@ -11,7 +11,10 @@ using namespace sfw;
 bool clickedR = false;
 bool clickedL = false;
 bool isUserInMenu = true;
+bool printGrid = false;
+bool debug = false;
 bool first = true;
+bool ai = true;
 float x, y;
 
 int checkEndConds()
@@ -23,42 +26,94 @@ int checkEndConds()
 	{
 		if (b_Current == b_HumanTC) { flagHTC = true; }
 		if (b_Current == b_InvaderTC) { flagITC = true; }
-
-		if (flagHTC && !flagITC) { m_End[1].setName("You Win"); return 0; }
-		if (!flagHTC && flagITC) { return 1; }
-		else { return -1; }
 	}
+
+	if (flagHTC && !flagITC) { m_End[0].setName("You Win"); return 0; }
+	if (!flagHTC && flagITC) { return 1; }
+	else { return -1; }
 }
 
 void debugGameMode()
 {
-	if (first)
-	{
-		initGame();
-		first = false;
-	}
-
-	/*int key = checkBindings();*/
 	int mouse = checkMouse();
+	int key = checkBindings();
 
-	/*if (key == KEY_I) { spawnUnit(u_Invader); }
-	if (key == KEY_H)  { spawnUnit(u_Human); }
-	
-	if (key == KEY_B) { spawnBuild(b_HumanBarracks); }
-	if (key == KEY_T) { spawnBuild(b_HumanTower); }
-	if (key == KEY_C) { spawnBuild(b_HumanTC); }
+	if (debug)
+	{
+		p_Player.addMoney(1);
 
-	if (key == SHF_B) { spawnBuild(b_InvaderBarracks); }
-	if (key == SHF_T) { spawnBuild(b_InvaderTower); }
-	if (key == SHF_C) { spawnBuild(b_InvaderTC); }
-	
-	if (key == KEY_BACKSPACE) { killUnits(); killBuild(); }*/
+		if (key == KEY_I) { spawnUnit(u_Invader); }
+		if (key == KEY_H) { spawnUnit(u_Human); }
+
+		if (key == KEY_B) { spawnBuild(b_HumanBarracks); }
+		if (key == KEY_T) { spawnBuild(b_HumanTower); }
+		if (key == KEY_C) { spawnBuild(b_HumanTC); }
+
+		if (key == SHF_B) { spawnBuild(b_InvaderBarracks); }
+		if (key == SHF_T) { spawnBuild(b_InvaderTower); }
+		if (key == SHF_C) { spawnBuild(b_InvaderTC); }
+
+		if (key == KEY_RCTRL)
+		{
+			switch (ai)
+			{
+			case true: ai = false; break;
+			case false: ai = true; break;
+			}
+		}
+		if (key == KEY_LCTRL)
+		{
+			switch (printGrid)
+			{
+			case true: printGrid = false; break;
+			case false: printGrid = true; break;
+			}
+		}
+		if (key == KEY_BACKSPACE) { killUnits(); killBuild(); }
+	}
 	
 	if (mouse == MOUSE_BUTTON_LEFT)
 	{
-		if (!clickedL) { x = getMouseX(); y = getMouseY(); clickedL = true; }
-		if (y <= ySpace(20)) { clickedL = false; }
-		drawBox(x, y, -(y - getMouseY()), -(x - getMouseX()), MAGENTA);
+		switch (overrideMouse)
+		{
+		case 0:
+			if (mouseTint == GREEN && !debug)
+			{
+				spawnBuild(b_HumanBarracks);
+				p_Player.addMoney(-(b_HumanBarracks.getCost()));
+				overrideMouse = -1;
+				mouseTint = CYAN;
+			}
+			else if(debug)
+			{
+				spawnBuild(b_HumanBarracks);
+				p_Player.addMoney(-(b_HumanBarracks.getCost()));
+				overrideMouse = -1;
+				mouseTint = CYAN;
+			}
+			break;
+		case 1:
+			if (mouseTint == GREEN && !debug)
+			{
+				spawnBuild(b_HumanTower);
+				p_Player.addMoney(-(b_HumanTower.getCost()));
+				overrideMouse = -1;
+				mouseTint = CYAN;
+			}
+			else if (debug)
+			{
+				spawnBuild(b_HumanTower);
+				p_Player.addMoney(-(b_HumanTower.getCost()));
+				overrideMouse = -1;
+				mouseTint = CYAN;
+			}
+			break;
+		default:
+			if (!clickedL) { x = getMouseX(); y = getMouseY(); clickedL = true; }
+			if (y <= ySpace(20)) { clickedL = false; }
+			drawBox(x, y, -(y - getMouseY()), -(x - getMouseX()), MAGENTA);
+			break;
+		}
 	}
 	else
 	{
@@ -67,8 +122,8 @@ void debugGameMode()
 			float selbox[4];
 			selbox[0] = x; selbox[1] = y; selbox[2] = -(y - getMouseY()); selbox[3] = -(x - getMouseX());
 			selectEnts(selbox);
+			clickedL = false;
 		}
-		clickedL = false;
 	}
 
 	if (mouse == MOUSE_BUTTON_RIGHT)
@@ -142,10 +197,10 @@ void debugMenuMode()
 		default: drawSelBox(m_Clr[getSelectedColor()], BLACK); break;
 		}
 		break;
-	case OPT_CTRL_MOVE:
+	/*case OPT_CTRL_MOVE:
 		break;
 	case OPT_CTRL_HOTKEY:
-		break;
+		break;*/
 	default:
 		switch (drawMenu(m_Dflt))
 		{
@@ -160,6 +215,8 @@ void main()
 	initContext(SCREEN[0], SCREEN[1], "RTS");
 	initUI();
 	initEnts();
+	initBuildGrid();
+	//debug = true;
 
 	float tempTimer = 0.0f;
 
@@ -168,11 +225,21 @@ void main()
 		if (isUserInMenu) { debugMenuMode(); }
 		else
 		{
+			if (first)
+			{
+				initGame();
+				first = false;
+			}
+
 			switch (checkEndConds())
 			{
-			case -1: debugGameMode(); updateEnts(); ai_Run(); break;
+			case -1: 
+				debugGameMode(); 
+				updateEnts(); 
+				if (ai) { ai_Run(); } 
+				break;
 			default:
-				if (drawMenu(m_End) == 2)
+				if (drawMenu(m_End) == 1)
 				{
 					isUserInMenu = true;
 					first = true;
@@ -187,6 +254,31 @@ void main()
 			}
 		}
 
-		drawMouse();
+		switch (overrideMouse)
+		{
+		case 0:
+			drawMouse(ui_Barracks, 0, hi_Barracks, wi_Barracks, 1, 1); 
+			drawBuildGrid();
+			break;
+		case 1: 
+			drawMouse(ui_Tower, 1, hi_Tower, wi_Tower, 1, 1); 
+			drawBuildGrid();
+			break;
+		default: drawMouse(); break;
+		}
+
+
+		if (printGrid)
+		{
+			const int boxSize = 10;
+
+			for (float x = xSpace(0); x / xSpace(5) != 20; x += xSpace(boxSize))
+			{
+				for (float y = ySpace(20); y / ySpace(5) != 20; y += ySpace(boxSize))
+				{
+					drawBox(x, y, ySpace(boxSize), xSpace(boxSize), RED);
+				}
+			}
+		}
 	}
 }

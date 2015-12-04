@@ -1,12 +1,15 @@
 #include "ui.h"
+#include "../ent/ent.h"
 #include <iostream>
 using namespace std;
 
 bool isUnitOnOverlay = false;
 bool isBuildOnOverlay = false;
 
+int overrideMouse = -1;
 int entOnOverlay = 0;
 
+float buildGrid[gridY][gridX];
 float SCREEN[2] = { 995, 995 };
 
 unsigned ui_Text;
@@ -16,6 +19,8 @@ unsigned ui_TownCenter;
 unsigned ui_Tower;
 unsigned ui_Barracks;
 unsigned ui_Overlay;
+unsigned ui_Mouse;
+unsigned mouseTint = CYAN;
 
 float xSpace(float num, float den) { return (SCREEN[0] / den) * num; }
 float ySpace(float num, float den) { return (SCREEN[1] / den) * num; }
@@ -29,6 +34,17 @@ void initUI()
 	ui_Tower = loadTextureMap("./source/assets/Tower.png", 2);
 	ui_Barracks = loadTextureMap("./source/assets/barracks.png");
 	ui_Overlay = loadTextureMap("./source/assets/overlay.png");
+}
+void initBuildGrid()
+{
+	for (int y = 0; y < gridY; y++)
+	{
+		for (int x = 0; x < gridX; x++)
+		{
+			buildGrid[y][x] = x;
+		}
+	}
+	
 }
 
 char itc(int a)
@@ -196,4 +212,159 @@ void drawBox(float x, float y, float h, float w, unsigned tint)
 	drawLine(x, y + h, x + w, y + h, tint);
 }
 
-void drawMouse() { drawTexture(ui_Text, getMouseX(), getMouseY(), wi_Text * 3, hi_Text * 3, 0, true, 49, CYAN); }
+void drawMouse(unsigned sprite, int index, float h, float w, float multH, float multW)
+{
+	drawTexture(sprite, getMouseX(), getMouseY(), w * multW, h * multH, 0, true, index, mouseTint); 
+}
+
+//Red squares indicate where you cannot build anything
+//Blue squares indicate where you can build barracks
+//Green squares indicate where you can build towers
+// xSpace(buildGrid[y][x] * 10) = x
+// ySpace((buildGrid[y][x] + y + 2 - x) * 10) = y
+void drawBuildGrid()
+{
+	// All: -1, 1 == RED
+	// Towers: 3 == RED; 0, 2 == GREEN
+	// Barracks: 0, 2 == RED; 3 == GREEN;
+	int bat[gridY + 1][gridX + 1];
+
+	bat[gridY][gridX] = -2;
+
+	int mgx = gridY;
+	int mgy = gridX;
+
+	float mx = getMouseX();
+	float my = getMouseY();
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			bat[a][b] = -1;
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_HumanTower)
+		{
+			if (y + 1 != 8)
+			{
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				bat[y + 1][x] = 2;
+			}
+			if (y - 1 != -1)
+			{
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				bat[y - 1][x] = 2;
+			}
+			if (x + 1 != 10)
+			{
+				drawBox(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				bat[y][x + 1] = 2;
+			}
+			if (x - 1 != -1)
+			{
+				drawBox(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				bat[y][x - 1] = 2;
+			}
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_HumanBarracks)
+		{
+			bat[y][x] = 0;
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_HumanTower)
+		{
+			if (bat[y][x] == 0) { bat[y][x] = 1; }
+			else { bat[y][x] = 3; }
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_HumanTC)
+		{
+			bat[y][x] = 1;
+		}
+	}
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			if (bat[a][b] == 0) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), GREEN); }
+		}
+	}
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			if (bat[a][b] == 3) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), BLUE); }
+		}
+	}
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			if (bat[a][b] == 1) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), RED); }
+		}
+	}
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			float x = xSpace(buildGrid[a][b] * 10);
+			float y = ySpace((buildGrid[a][b] + a + 2 - b) * 10);
+			float h = ySpace(10) + y;
+			float w = xSpace(10) + x;
+
+			if (mx > x && mx < w && my > y && my < h)
+			{
+				mgx = b; mgy = a;
+				b = gridX; a = gridY;
+			}
+		}
+	}
+
+	//PRINT bat[mgy][mgx] NL;
+
+	switch (bat[mgy][mgx])
+	{
+	case -1: case 1:
+		mouseTint = RED; break;
+	case 0:  case 2:
+		if (overrideMouse == 1) { mouseTint = GREEN; }
+		else if (overrideMouse == 0) { mouseTint = RED; }
+		break;
+	case 3:
+		if (overrideMouse == 1) { mouseTint = RED; }
+		else if (overrideMouse == 0) { mouseTint = GREEN; }
+		break;
+	default:
+		mouseTint = RED;
+	}
+}

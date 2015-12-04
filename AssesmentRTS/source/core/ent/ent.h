@@ -40,6 +40,7 @@ protected:
 	PosDim pd;
 	unsigned sprite;
 	int hp, dmg, spriteIndex = 0;
+	int cost = 5;
 	bool selected = false;
 	char *name;
 public:
@@ -48,6 +49,7 @@ public:
 	int getHP();
 	int getDMG();
 	int getSpriteIndex();
+	int getCost();
 	bool getSelected();
 	char *getName();
 
@@ -58,6 +60,7 @@ public:
 	void setSelected(bool cr);
 	void setSpriteIndex(int si);
 	void setName(char *n);
+	void setCost(int c);
 };
 
 class Unit : public Entity
@@ -170,22 +173,26 @@ extern Unit *u_AllDynam;
 #define u_Human		u_AllBase[1]
 #define u_Invader	u_AllBase[2]
 #define u_Current	u_AllDynam[a]
+#define u_Targeted	u_AllDynam[u.getTargetedUnit()]
 
 class Building : public Entity
 {
 private:
 	int maxQueue, buildingID;
-	float atkRad, saveTrainTime = 0;
+	float atkRad, saveTrainTime = 0, baseTrainTime = 3.0f, currentTrainTime = 3.0f;
 	float atkSpeed, lstAtk = 0.0f;
 public:
-	int queue[10];
 	//Note: This return the index used to initialize, not the last index
+	int queue[10];
+	int gridPos[2];
 	int getMaxQueue();
 	int getID();
 	float getAtkRad();
 	float getElapsedTrainTime();
 	float getAtkSpeed();
 	float getLastAtk();
+	float getBaseTrainTime();
+	float getTrainTime();
 
 	void setMaxQueue(int mq);
 	void setAtkRad(float ar);
@@ -193,6 +200,7 @@ public:
 	void setElapsedTrainTime(float ett);
 	void setAtkSpeed(float as);
 	void setLastAtk(float la);
+	void setTrainTime(float tt);
 
 	Building(void)
 	{
@@ -202,14 +210,15 @@ public:
 		setSelected(false);
 		setName("DEFAULT");
 	}
-	Building(int ID, char *name, unsigned s, int HP, int DMG, int mq, float ar, float as, int si)
+	Building(int ID, char *name, unsigned sprite, int spriteIndex, int HP, int DMG, float atkRad, float atkSpd, int cost)
 	{
-		setSprite(s); setID(ID);
+		setSprite(sprite); setID(ID);
 		setHP(HP); setDMG(DMG);
-		setMaxQueue(mq); setAtkRad(ar);
-		setSpriteIndex(si);
+		setAtkRad(atkRad);
+		setSpriteIndex(spriteIndex);
 		setName(name);
-		setAtkSpeed(as);
+		setAtkSpeed(atkSpd);
+		setCost(cost);
 	}
 
 	Building &operator=(Building &b)
@@ -226,6 +235,9 @@ public:
 		name		= b.getName();
 		maxQueue	= b.getMaxQueue();
 		atkSpeed	= b.getAtkSpeed();
+		cost		= b.getCost();
+		gridPos[0]	= b.gridPos[0];
+		gridPos[1]	= b.gridPos[1];
 		return *this;
 	}
 	bool operator==(Building &b)
@@ -246,6 +258,7 @@ extern Building *b_AllDynam;
 #define b_InvaderTower		b_AllBase[5]
 #define b_InvaderBarracks	b_AllBase[6]
 #define b_Current			b_AllDynam[a]
+#define b_Targeted			b_AllDynam[u.getTargetedBuild()]
 
 class Bullet : public Entity
 {

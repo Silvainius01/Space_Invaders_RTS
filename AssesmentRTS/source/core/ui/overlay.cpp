@@ -3,7 +3,11 @@
 #include "../ent/ent.h"
 #include "../math.h"
 #include "../fileio/fileio.h"
+#include "../Game/game.h"
+
 #include <iostream>
+#include <string>
+#include <sstream>
 using namespace std;
 
 #define u_EntOnOverlay u_AllDynam[entOnOverlay]
@@ -29,14 +33,23 @@ char *doTheThingToProfName()
 }
 
 
-Button m_EntOverlay[] = { Button("Default", xSpace(50), ySpace(7.5), 2, 2, WHITE, CENTER, false),
+Button m_EntOverlay[] =	   {Button("Default", xSpace(50), ySpace(7.5), 2, 2, WHITE, CENTER, false),
 							Button("HP :", xSpace(5), ySpace(14), 2, 2, WHITE, RIGHT, false), Button("NV", m_EntOverlay[1].getXPos() + (strlen(m_EntOverlay[1].getName()) * 9 * 3), m_EntOverlay[1].getYPos(), m_EntOverlay[1].getHeight(), m_EntOverlay[1].getWidth(), WHITE, RIGHT, false),
 							Button("DMG:", xSpace(5), ySpace(11.5), 2, 2, WHITE, RIGHT, false), Button("NV", m_EntOverlay[3].getXPos() + (strlen(m_EntOverlay[3].getName()) * 9 * 3), m_EntOverlay[3].getYPos(), m_EntOverlay[3].getHeight(), m_EntOverlay[3].getWidth(), WHITE, RIGHT, false),
 							Button("Owner:", xSpace(5), ySpace(9), 2, 2, WHITE, RIGHT, false), Button(profileName, m_EntOverlay[5].getXPos(), m_EntOverlay[5].getYPos() - ySpace(2.5), m_EntOverlay[5].getHeight(), m_EntOverlay[5].getWidth(), playerColor, RIGHT, false),
 							Button("Target:", xSpace(63), ySpace(14), 2, 2, WHITE, RIGHT, false),
-								Button("Nothing", xSpace(63), ySpace(11.5), 2, 2, MAGENTA, RIGHT, false),
-								Button("Units",xSpace(63), ySpace(9), 2, 2, WHITE, RIGHT),
-								Button("Buildings", xSpace(63), ySpace(6.5), 2, 2, WHITE, RIGHT),
+							Button("Nothing", xSpace(63), ySpace(11.5), 2, 2, MAGENTA, RIGHT, false),
+							Button("Units",xSpace(63), ySpace(9), 2, 2, WHITE, RIGHT),
+							Button("Buildings", xSpace(63), ySpace(6.5), 2, 2, WHITE, RIGHT),
+							Button("\0", xSpace(105), m_EntOverlay[10].getYPos(), 2, 2, WHITE, RIGHT, false),
+							Button(" percent", xSpace(105), m_EntOverlay[11].getYPos(), 2, 2, WHITE, RIGHT, false),
+							Button() };
+
+Button m_PlyrOverlay[] = {  Button("Money:", xSpace(5), ySpace(14), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[0].getXPos() + (strlen(m_PlyrOverlay[0].getName()) * 9 * 3), m_PlyrOverlay[0].getYPos(), m_PlyrOverlay[0].getHeight(), m_PlyrOverlay[0].getWidth(), GREEN, RIGHT, false),
+							Button("Buy:", xSpace(63), ySpace(14), 2, 2, WHITE, RIGHT, false),
+							Button("Barracks", xSpace(63), ySpace(11.5), 2, 2, WHITE, RIGHT),
+							Button("Tower", xSpace(63), ySpace(9), 2, 2, WHITE, RIGHT),
+							Button("Cost: ", xSpace(63), ySpace(6.5), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[5].getXPos() + (strlen(m_PlyrOverlay[5].getName()) * 9 * 3), m_PlyrOverlay[5].getYPos(), m_PlyrOverlay[5].getHeight(), m_PlyrOverlay[5].getWidth(), GREEN, RIGHT, false),
 							Button() };
 
 void drawGameOverlay()
@@ -63,6 +76,7 @@ void drawGameOverlay()
 		m_EntOverlay[8].setName("Nothing");
 		m_EntOverlay[9].setName("Units");
 		m_EntOverlay[10].setName("Buildings");
+		m_EntOverlay[11].setName('\0');
 		switch (u_EntOnOverlay.getTarget())
 		{
 		case NOTHING:
@@ -96,10 +110,22 @@ void drawGameOverlay()
 	}
 	else if (isBuildOnOverlay)
 	{
+		/*char outputarray[20];
+		_itoa_s(234,outputarray,20,10);
+		
+		std::string d = std::to_string(234);
+		d.c_str();
+
+		std::stringstream ss;
+		ss << 234;
+		ss.str().c_str();*/
+
 		int HP = b_EntOnOverlay.getHP();
 		int DMG = b_EntOnOverlay.getDMG();
+		int percent = 100 * (b_EntOnOverlay.getElapsedTrainTime() / b_EntOnOverlay.getTrainTime());
 		char hp[4] = { itc(getHundredsPlace(HP)), itc(getTensPlace(HP)), itc(HP % 10), '\0' };
 		char dmg[4] = { itc(getHundredsPlace(DMG)), itc(getTensPlace(DMG)), itc(DMG % 10), '\0' };
+		char train[3]{ itc(getTensPlace(percent)), itc(percent % 10), '\0' };
 		PosDim pd = b_EntOnOverlay.getPosDim();
 		drawTexture(b_EntOnOverlay.getSprite(), xSpace(50), ySpace(11), pd.w, pd.h, 0, true, b_AllDynam[entOnOverlay].getSpriteIndex());
 		m_EntOverlay[0].setName(b_EntOnOverlay.getName());
@@ -132,10 +158,13 @@ void drawGameOverlay()
 			m_EntOverlay[8].setClickable(true);
 			m_EntOverlay[9].setName("Queue:");
 			m_EntOverlay[9].setClickable(false);
+			m_EntOverlay[10].setClickable(false);
 			m_EntOverlay[10].setName(cnt);
+			m_EntOverlay[11].setXPos(m_EntOverlay[10].getXPos() + ((strlen(m_EntOverlay[10].getName()) + 1) * 9 * 3));
+			m_EntOverlay[12].setXPos(m_EntOverlay[11].getXPos() + (strlen(m_EntOverlay[11].getName()) * 9));
+			m_EntOverlay[11].setName(train);
 		}
 		else { m_EntOverlay[7].setName('\0'); }
-		//m_EntOverlay[10].setName();  //Counts the amount in queue and portrays the number.
 		switch (drawMenu(m_EntOverlay))
 		{
 		case 8:
@@ -150,6 +179,37 @@ void drawGameOverlay()
 			break;
 		default:
 			break;
+		}
+	}
+	else
+	{
+		int HP = 0;
+		int MONEY = p_Player.getMoney();
+
+		if (MONEY > 999) { MONEY = 999; p_Player.addMoney(-(p_Player.getMoney() - MONEY)); }
+		if (m_PlyrOverlay[3].isButtonHighlighted()) { HP = b_HumanBarracks.getCost(); }
+		else if (m_PlyrOverlay[4].isButtonHighlighted()) { HP = b_HumanTower.getCost(); }
+
+		char money[4] = { itc(getHundredsPlace(MONEY)), itc(getTensPlace(MONEY)), itc(MONEY % 10), '\0' };
+		char hp[4] = { itc(getHundredsPlace(HP)), itc(getTensPlace(HP)), itc(HP % 10), '\0' };
+		
+		m_PlyrOverlay[6].setName(hp);
+		m_PlyrOverlay[1].setName(money);
+
+		//m_PlyrOverlay[0].setClickable(true);
+
+		switch (drawMenu(m_PlyrOverlay))
+		{
+		case 0:
+			p_Player.addMoney(200);
+			break;
+		case 3: 
+			if(p_Player.getMoney() >= b_HumanBarracks.getCost()) { overrideMouse = 0; }
+			break;
+		case 4:	
+			if (p_Player.getMoney() >= b_HumanTower.getCost()) { overrideMouse = 1; }
+			break;
+		default: break;
 		}
 	}
 }

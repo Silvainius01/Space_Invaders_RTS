@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Header.h" />
     <ClInclude Include="source\core\ent\ent.h" />
     <ClInclude Include="source\core\fileio\fileio.h" />
     <ClInclude Include="source\core\Game\game.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="source\core\ui\ui.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\core\Game\player.cpp" />
     <ClCompile Include="source\core\ent\ent.cpp" />
     <ClCompile Include="source\core\ent\entBuild.cpp" />
     <ClCompile Include="source\core\ent\entBullet.cpp" />

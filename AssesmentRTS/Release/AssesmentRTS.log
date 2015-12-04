@@ -1,12 +1,22 @@
-﻿Build started 12/1/2015 10:36:53 AM.
+﻿Build started 12/4/2015 2:01:57 PM.
      1>Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\Game\AI.cpp
-         AI.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(283): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\Game\AI.cpp(322): warning C4244: 'argument': conversion from 'double' to 'const int', possible loss of data
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\main.cpp source\core\ui\overlay.cpp
+         main.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\./ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\main.cpp(215): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+     1>source\core\main.cpp(260): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\main.cpp(264): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+     1>source\core\main.cpp(275): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+     1>source\core\main.cpp(277): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+     1>source\core\main.cpp(279): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+         overlay.cpp
+     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>source\core\ui\overlay.cpp(21): warning C4018: '<': signed/unsigned mismatch
+     1>source\core\ui\overlay.cpp(125): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe" /NOLOGO ./source/core/libraries/sfw.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.pdb" /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.lib" /MACHINE:X86 /SAFESEH Release\ent.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe" /NOLOGO ./source/core/libraries/sfw.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.pdb" /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.lib" /MACHINE:X86 /SAFESEH Release\player.obj
+         Release\ent.obj
          Release\entBuild.obj
          Release\entBullet.obj
          Release\entUnit.obj
@@ -21,11 +31,9 @@
          Release\ui.obj
          source\core\libraries\sfw.lib
          Generating code
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\math.h(26): warning C4715: 'expo<float>': not all control paths return a value
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\main.cpp(31): warning C4715: 'checkEndConds': not all control paths return a value
-         165 of 803 functions (20.5%) were compiled, the rest were copied from previous compilation.
-           19 functions were new in current compilation
-           31 functions had inline decision re-evaluated but remain unchanged
+         3 of 824 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+           0 functions were new in current compilation
+           3 functions had inline decision re-evaluated but remain unchanged
          Finished generating code
      1>sfw.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
      1>sfw.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
@@ -35,4 +43,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.80
+Time Elapsed 00:00:05.02

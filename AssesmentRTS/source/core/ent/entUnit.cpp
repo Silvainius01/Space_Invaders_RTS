@@ -25,19 +25,19 @@ bool	Unit::isTargetUnit()			{ return isUnitTarget; }
 bool	Unit::isTargetInRange()			{ return targetInRange; }
 void	Unit::setSpeed(float s)	{ speed = s; }
 void	Unit::setID(int ID)	{ unitID = ID; }
-void	Unit::setTargetCoords(float x, float y) { targetX = x; targetY = y; moving = true; hasSlope = false; }
-void	Unit::stopMoving() { moving = false; hasSlope = false; }
-void	Unit::setAxisSpeeds(float sx, float sy) { speedX = sx; speedY = sy; hasSlope = true; }
-void	Unit::setAtkRad(float ar) { atkRad = ar; }
-void	Unit::setSavedCoords() { saveTX = targetX, saveTY = targetY, hasSavedCoords = true; }
-void	Unit::setUnitCollision(bool hasCollided) { collided = hasCollided; if (!hasCollided) { hasSavedCoords = false; } }
-void	Unit::setTarget(Target t) { target = t; }
-void	Unit::setTargetedUnit(int index) { u_Target = index; isUnitTarget = true; hasTarget = true;}
-void	Unit::setTargetedBuild(int index) { b_Target = index; isUnitTarget = false; hasTarget = true; }
-void	Unit::setTargetInRange(bool tir) { targetInRange = tir; }
-void	Unit::setAttackSpeed(float as) { atkSpeed = as; }
-void	Unit::setLastAttack(float la) { lastAtk = la; }
-void	Unit::setTargetStatus(bool ht) { hasTarget = ht; }
+void	Unit::setTargetCoords(float x, float y)		{ targetX = x; targetY = y; moving = true; hasSlope = false; }
+void	Unit::stopMoving()							{ moving = false; hasSlope = false; }
+void	Unit::setAxisSpeeds(float sx, float sy)		{ speedX = sx; speedY = sy; hasSlope = true; }
+void	Unit::setAtkRad(float ar)					{ atkRad = ar; }
+void	Unit::setSavedCoords()						{ saveTX = targetX, saveTY = targetY, hasSavedCoords = true; }
+void	Unit::setUnitCollision(bool hasCollided)	{ collided = hasCollided; if (!hasCollided) { hasSavedCoords = false; } }
+void	Unit::setTarget(Target t)					{ target = t; }
+void	Unit::setTargetedUnit(int index)			{ u_Target = index; isUnitTarget = true; hasTarget = true;}
+void	Unit::setTargetedBuild(int index)			{ b_Target = index; isUnitTarget = false; hasTarget = true; }
+void	Unit::setTargetInRange(bool tir)			{ targetInRange = tir; }
+void	Unit::setAttackSpeed(float as)				{ atkSpeed = as; }
+void	Unit::setLastAttack(float la)				{ lastAtk = la; }
+void	Unit::setTargetStatus(bool ht)				{ hasTarget = ht; }
 
 int unitSpawnIndex = 1;
 Unit u_AllBase[unitIndex];
@@ -98,7 +98,7 @@ void spawnUnit(Unit u, float x, float y, float tx, float ty)
 
 	if (!isIndexOpen)
 	{
-		if (unitSpawnIndex >= 0) { unitSpawnIndex = 1; }
+		if (unitSpawnIndex <= 0) { unitSpawnIndex = 1; }
 		Unit *temp = new Unit[unitSpawnIndex];
 		for (int a = 0; a < unitSpawnIndex; a++) { temp[a] = u_Current; }
 		openIndex = unitSpawnIndex;
@@ -111,6 +111,7 @@ void spawnUnit(Unit u, float x, float y, float tx, float ty)
 
 	if (tx != 0 && ty != 0) { u.setTargetCoords(tx, ty); }
 	u.setPosDim({ x, y, getUnitH(u), getUnitW(u) });
+	u.setUnitCollision(false);
 	u_AllDynam[openIndex] = u;
 }
 void killUnits()
@@ -134,13 +135,30 @@ void shootTarget(Unit &u)
 		float r = u.getAtkRad();
 		if (u.isTargetUnit())
 		{
-			if (u_AllDynam[u.getTargetedUnit()] == u_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+
+			if (u_Targeted == u_Empty || u == u_Targeted) { u.setTargetStatus(false); u.setTargetInRange(false); }
 			else { blerg = u_AllDynam[u.getTargetedUnit()].getPosDim(); inited = true; }
 		}
 		else
 		{
-			if (b_AllDynam[u.getTargetedBuild()] == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
-			else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+			if (b_Targeted == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+			if (u == u_Human)
+			{
+				if (b_Targeted == b_HumanBarracks || b_Targeted == b_HumanTC || b_Targeted == b_HumanTower)
+				{
+					u.setTargetStatus(false); u.setTargetInRange(false);
+				}
+				else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+			}
+			else if (u == u_Invader)
+			{
+				if (b_Targeted == b_InvaderBarracks || b_Targeted == b_InvaderTC || b_Targeted == b_InvaderTower)
+				{
+					u.setTargetStatus(false); u.setTargetInRange(false);
+				}
+				else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+			}
+			
 		}
 
 		if (inited)

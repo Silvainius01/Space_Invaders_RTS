@@ -2,6 +2,7 @@
 #include "../math.h"
 #include "../ui/input.h"
 #include "../ui/ui.h"
+#include "../Game/game.h"
 using namespace std;
 using namespace sfw;
 
@@ -10,6 +11,7 @@ unsigned Entity::getSprite()			{ return sprite; }
 int		 Entity::getHP()				{ return hp; }
 int		 Entity::getDMG()				{ return dmg; }
 int		 Entity::getSpriteIndex()		{ return spriteIndex; }
+int		 Entity::getCost()				{ return cost; }
 bool	 Entity::getSelected()			{ return selected; }
 char*	 Entity::getName()				{ return name; }
 void	 Entity::setPosDim(PosDim PD)	{ pd = PD; }
@@ -19,6 +21,7 @@ void	 Entity::setDMG(int DMG)		{ dmg = DMG; }
 void	 Entity::setSelected(bool cr)	{ selected = cr; }
 void	 Entity::setSpriteIndex(int si) { spriteIndex = si; }
 void	 Entity::setName(char *n)		{ name = n; }
+void	 Entity::setCost(int c)			{ cost = c; }
 
 int dealDamage(Building &b, Unit &u, bool isBuildAtkUnit);
 
@@ -28,16 +31,16 @@ void initEnts()
 	u_AllDynam	= new Unit[unitSpawnIndex];
 	u_AllDynam[0] = u_Empty;
 
-	u_Human		= Unit(0, "Human\nSoldier", ui_Human, 100, 5, 20.0f, 100.0f, 1.13f);
-	u_Invader	= Unit(1, "Invader\nSoldier", ui_Invader, 100, 2, 20.0f, 100.0f, 0.5f);
+	u_Human		= Unit(0, "Human\nSoldier", ui_Human, 50, 5, 30.0f, 100.0f, 1.12f);
+	u_Invader	= Unit(1, "Invader\nSoldier", ui_Invader, 75, 2, 20.0f, 75.0f, 0.4f);
 
 	b_Empty		= Building();
 	b_AllDynam	= new Building[buildSpawnIndex];
 	b_AllDynam[0] = b_Empty;
 
-	b_HumanTC			= Building(0, "Town\nCenter", ui_TownCenter, 500, 0, 1, 0, 0, 1);
-	b_HumanTower		= Building(1, "Tower", ui_Tower, 300, 25, 1, 150.0f, 1.5f, 1);
-	b_HumanBarracks		= Building(2, "Barracks", ui_Barracks, 200, 0, 10, 0, 0, 0);
+	b_HumanTC			= Building(0, "Town\nCenter", ui_TownCenter, 1, 500, 0, 0, 0, 0);
+	b_HumanTower		= Building(1, "Tower", ui_Tower, 1, 300, 25, 150.0f, 1.5f, 200);
+	b_HumanBarracks		= Building(2, "Barracks", ui_Barracks, 0, 200, 0, 0, 0, 350);
 	b_InvaderTC =		b_HumanTC;			b_InvaderTC.setID(3);		b_InvaderTC.setSpriteIndex(0);
 	b_InvaderTower =	b_HumanTower;		b_InvaderTower.setID(4);	b_InvaderTower.setSpriteIndex(0);
 	b_InvaderBarracks = b_HumanBarracks;	b_InvaderBarracks.setID(5);	b_InvaderBarracks.setSpriteIndex(0);
@@ -56,8 +59,16 @@ void checkCollision(Unit &u, int index, bool isBuild = false)
 {
 	PosDim ua[2] = { u.getPosDim() };
 
-	if (isBuild) { ua[1] = b_AllDynam[index].getPosDim(); }
-	else { ua[1] = u_AllDynam[index].getPosDim(); }
+	if (isBuild)
+	{ 
+		if (index >= buildSpawnIndex) { PRINT "Collision index out of range: " << index _ isBuild NL; return; }
+		ua[1] = b_AllDynam[index].getPosDim(); 
+	}
+	else 
+	{ 
+		if (index >= unitSpawnIndex) { PRINT "Collision index out of range: " << index _ isBuild NL; return; }
+		ua[1] = u_AllDynam[index].getPosDim(); 
+	}
 
 	// l = x - (w / 2)
 	// r = x + (w / 2)
@@ -125,29 +136,20 @@ void checkCollision(Unit &u, int index, bool isBuild = false)
 				u.setTargetCoords(ua[0].x - ua[1].w, ua[0].y);
 				break;
 			}
-
 		}
 	}
 }
 void getCollisionCandidates(Unit &u)
 {
-	const float r = u.getAtkRad() / 2;
+	float r;
 	float dist;
 	bool checkBuilds = false;
 	int spawnIndex = unitSpawnIndex;
 	PosDim rupd = u.getPosDim();
 	PosDim ucpd;
 
-	if (rupd.x + (rupd.h / 2) >= xSpace(79) - (wi_Tower / 2) && rupd.y - (rupd.h / 2) <= ySpace(41) + (hi_Tower / 2))
-	{ 
-		checkBuilds = true;
-		spawnIndex = buildSpawnIndex;
-	}
-	else if (rupd.x <= xSpace(21) + (wi_Tower / 2) && rupd.y >= ySpace(79) - (hi_Tower / 2))
-	{ 
-		checkBuilds = true; 
-		spawnIndex = buildSpawnIndex;
-	}
+	if (rupd.h > rupd.w) { r = rupd.h; }
+	else { r = rupd.w; }
 
 	for (int a = 0; a < spawnIndex; a++)
 	{
@@ -159,8 +161,8 @@ void getCollisionCandidates(Unit &u)
 
 		if (dist <= r)
 		{
-			if (checkBuilds) { checkCollision(u, a, true); }
-			else { checkCollision(u, a); }
+			checkCollision(u, a, true);
+			checkCollision(u, a);
 		}
 	}
 }
@@ -174,12 +176,17 @@ void updateEnts()
 	{
 		if (u_Current != u_Empty)
 		{
-			if (u_Current.getHP() <= 0) { u_Current = u_Empty; }
+			if (u_Current.getHP() <= 0) 
+			{ 
+				if (u_Current == u_Invader) { p_Player.addMoney(10); }
+				else if (u_Current == u_Human) { p_AI.addMoney(10); }
+				u_Current = u_Empty; 
+			}
 			else
 			{
 				_pd = u_Current.getPosDim();
 
-				if (!u_Current.hasUnitCollided()) { getCollisionCandidates(u_Current); }
+				if (!u_Current.hasUnitCollided() && u_Current.getTarget() == NOTHING) { getCollisionCandidates(u_Current); }
 				
 				if (u_Current.getTarget() != NOTHING && !u_Current.doesUnitHaveTarget()) { findTarget(u_Current); }
 				
@@ -206,15 +213,30 @@ void updateEnts()
 
 	for (int a = 0; a < buildSpawnIndex; a++)
 	{
-		if (b_Current == b_Empty) { continue; 
-		}
+		if (b_Current == b_Empty) { continue; }
 		_pd = b_Current.getPosDim();
 
-		if (b_Current.getHP() <= 0) { b_Current = b_Empty; }
+		if (b_Current.getHP() <= 0) 
+		{ 
+			int count = 0;
+			if(b_Current == b_HumanBarracks) 
+			{
+				for (int a = 0; a < 10; a++) { if (b_Current.queue[a] != -1) { count++; } else { a = 10; } }
+				p_AI.addMoney((count * 10));
+			}
+			else if (b_Current == b_HumanTower) { p_AI.addMoney(50); }
+			else if(b_Current == b_InvaderBarracks)
+			{
+				count = 0;
+				for (int a = 0; a < 10; a++) { if (b_Current.queue[a] != -1) { count++; } else { a = 10; } }
+				p_Player.addMoney((count * 10));
+			}
+			else if (b_Current == b_InvaderTower) { p_Player.addMoney(50); }
+			b_Current = b_Empty; 
+		}
 		else
 		{
 			updateQueue(b_Current);
-
 			drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, b_Current.getSpriteIndex());
 
 			if (b_Current == b_InvaderTower || b_Current == b_HumanTower) { checkForTargets(b_Current); }

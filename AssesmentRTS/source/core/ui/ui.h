@@ -21,7 +21,9 @@ private:
 	float xPos, yPos, height, width;
 	char *string;
 	bool clickable;
+	bool usesSprite = false; bool highlighted = false;
 	unsigned tint;
+	unsigned sprite;
 public:
 	TextAlign getAllign();
 	char* getName();
@@ -30,6 +32,7 @@ public:
 	float getHeight();
 	float getWidth();
 	bool isClickable();
+	bool isButtonHighlighted();
 	unsigned getTint();
 
 	void setName(char *n);
@@ -43,6 +46,7 @@ public:
 	void setAllign(TextAlign ta);
 	void setClickable(bool c);
 	void setTint(unsigned color);
+	void isHighlighted(bool ih);
 
 	Button(void)
 	{
@@ -56,6 +60,10 @@ public:
 		setAllign(ta);
 		setClickable(c);
 		setTint(tint);
+	}
+	Button(unsigned sprite, float x, float y, float h, float w, unsigned tint = WHITE, TextAlign ta = CENTER, bool c = true)
+	{
+
 	}
 };
 
@@ -87,11 +95,17 @@ extern Button m_End[3];
 extern bool isUnitOnOverlay;
 extern bool isBuildOnOverlay;
 
+extern int overrideMouse;
 extern int entOnOverlay;
 
+const int gridX = 10;
+const int gridY = 8;
+extern float buildGrid[gridY][gridX];
 extern float SCREEN[2];
 extern float xSpace(float num, float den = 100);
 extern float ySpace(float num, float den = 100);
+
+extern unsigned mouseTint;
 
 extern unsigned ui_Text;
 extern unsigned ui_Human;
@@ -120,9 +134,11 @@ extern int cti(char a);
 extern char itc(int a);
 
 extern void initUI();
+extern void initBuildGrid();
 extern void drawText(const char *string, float x, float y, int multH = 1, int multW = 1, bool drawUp = false, TextAlign ta = RIGHT, unsigned tint = WHITE);
-extern void drawBox(float x, float y, float h, float w, unsigned tint);
-extern void drawMouse();
+extern void drawBox(float x, float y, float h, float w, unsigned tint = WHITE);
+extern void drawMouse(unsigned sprite = ui_Text, int index = 49, float h = hi_Text, float w = wi_Text, float multH = 3, float multW = 3);
+extern void drawBuildGrid();
 
 extern int drawMenu(Button *b, int indexLimiter = -1);
 extern int getSelectedColor();
