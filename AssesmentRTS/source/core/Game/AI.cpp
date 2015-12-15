@@ -10,6 +10,9 @@ enum UnitTask
 	FIGHT_BUILDS = 2
 };
 
+bool canBuildTower = false;
+bool canBuildBarracks = false;
+
 int tempCount = 0;
 int money;
 int playerUnits;
@@ -23,8 +26,9 @@ int trainingUnits;
 int minUnits = 10;
 int barracks;
 int towers;
-
+int ai_bg[gridY][gridX];
 int tmr_Count = 0;
+
 float ai_TimerStart = 0.0f;
 float tmr_Update = ai_TimerStart;
 
@@ -78,17 +82,18 @@ int ai_CPUNB(bool countBuildingAttackers)
 {
 	int count = 0;
 	PosDim pd;
+	PosDim bpd;
+
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human)
+		if (u_Current == u_Human && u_Current.getTarget() == BUILDINGS)
 		{
 			pd = u_Current.getPosDim();
+			bpd = b_AllDynam[u_Current.getTargetedBuild()].getPosDim();
 
-			if (pd.x > xSpace(65) && pd.y < ySpace(55))
-			{
-				if (countBuildingAttackers && u_Current.getTarget() == BUILDINGS) { count++; }
-				else { count++; }
-			}
+			int dist = sqrt(expo<float>(abs(pd.x - bpd.x), 2) + expo<float>(abs(pd.y - bpd.y), 2));
+
+			if (dist <= u_Current.getAtkRad()) { count++; }
 		}
 	}
 
@@ -112,6 +117,31 @@ int ai_CPUIA(float x, float y, float h, float w, bool countOut = false)
 				{
 					count++;
 				}
+			}
+			else if (countOut)
+			{
+				count++;
+			}
+		}
+	}
+
+	return count;
+}
+
+//Counts the number of AI units that are or aren't in an area
+int ai_CMUIA(float x, float y, float h, float w, bool countOut = false)
+{
+	int count = 0;
+	PosDim pd;
+	for (int a = 0; a < unitSpawnIndex; a++)
+	{
+		if (u_Current == u_Invader)
+		{
+			pd = u_Current.getPosDim();
+
+			if (pd.x > x && pd.x < x + w && pd.y > y && pd.y < y + h && !countOut)
+			{
+				count++;
 			}
 			else if (countOut)
 			{
@@ -248,6 +278,101 @@ void ai_MU(const int numUnits, float tx, float ty)
 	}
 }
 
+//Determines where it can and can't build
+void ai_CBS()
+{
+	// All: -1, 1 == RED
+	// Towers: 3 == RED; 0, 2 == GREEN
+	// Barracks: 0, 2 == RED; 3 == GREEN
+
+	canBuildTower = false;
+	canBuildBarracks = false;
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			ai_bg[a][b] = -1;
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_InvaderTower)
+		{
+			if (y + 1 != 8)
+			{
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				ai_bg[y + 1][x] = 2;
+			}
+			if (y - 1 != -1)
+			{
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				ai_bg[y - 1][x] = 2;
+			}
+			if (x + 1 != 10)
+			{
+				drawBox(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				ai_bg[y][x + 1] = 2;
+			}
+			if (x - 1 != -1)
+			{
+				drawBox(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				ai_bg[y][x - 1] = 2;
+			}
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_InvaderBarracks)
+		{
+			ai_bg[y][x] = 0;
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_InvaderTower)
+		{
+			if (ai_bg[y][x] == 0) { ai_bg[y][x] = 1; }
+			else { ai_bg[y][x] = 3; }
+		}
+	}
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+	{
+		int x = b_Current.gridPos[1];
+		int y = b_Current.gridPos[0];
+
+		if (b_Current == b_InvaderTC)
+		{
+			ai_bg[y][x] = 1;
+		}
+	}
+
+	for (int a = 0; a < gridY; a++)
+	{
+		for (int b = 0; b < gridX; b++)
+		{
+			switch (ai_bg[a][b])
+			{
+			case 0: case 2: canBuildTower = true; break;
+			case 3: canBuildBarracks = true; break;
+			}
+		}
+	}
+}
+
 //Start training a certain number of units, will change based on availble room.
 void ai_QU(int numUnits)
 {
@@ -285,11 +410,7 @@ void ai_QU(int numUnits)
 //Build a tower
 void ai_PT()
 {
-	int blerg;
-	for (int a = 0; a != 100; a++)
-	{
-		//ai_CPUIA();
-	}
+	
 }
 
 //Build a barracks
@@ -337,7 +458,82 @@ void ai_CalcUnits()
 }
 void ai_CalcBuilds()
 {
+	ai_CBS();
+	if (money < b_InvaderTower.getCost()) { canBuildTower = false; return; }
 
+	if (canBuildTower || canBuildBarracks)
+	{
+		if (canBuildTower)
+		{
+			int bogp[2];
+			int punt = 0;
+			int comp = 0;
+			int val = 0;
+
+			for (int a = 0; a < buildSpawnIndex; a++)
+			{
+				if (b_Current == b_InvaderTower)
+				{
+					PosDim pd = b_Current.getPosDim();
+					val = ai_CPUIA(pd.x - (pd.x / 2), pd.y - (pd.y / 2), b_Current.getAtkRad(), b_Current.getAtkRad());
+					if (val > comp)
+					{
+						comp = val;
+						bogp[0] = b_Current.gridPos[0];
+						bogp[1] = b_Current.gridPos[1];
+					}
+					punt += val;
+				}
+			}
+
+			if (punt >= unitAttackers / 2)
+			{
+				int openSlots[4] = { -1, -1, -1, -1 };
+				int index = 0;
+				int comp = 0;
+				int y = bogp[0];
+				int x = bogp[1];
+
+				if (y + 1 < 8 && y - 1 > -1)
+				{
+					if (buildGrid[y + 1][x] == 0 || buildGrid[y + 1][x] == 2)
+						openSlots[2] = ai_CPUIA(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10));
+					if (buildGrid[y - 1][x] == 0 || buildGrid[y - 1][x] == 2)
+						openSlots[0] = ai_CPUIA(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10));
+				}
+				if (x + 1 < 10 && x - 1 > -1)
+				{
+					if (buildGrid[y][x + 1] == 0 || buildGrid[y][x + 1] == 2)
+						openSlots[1] = ai_CPUIA(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10));
+					if (buildGrid[y][x - 1] == 0 || buildGrid[y][x - 1] == 2)
+						openSlots[3] = ai_CPUIA(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10));
+				}
+
+				for (int a = 0; a < 4; a++)
+				{
+					if (openSlots[a] > comp) { comp = openSlots[a]; index = a; }
+				}
+
+				if (openSlots[index] > -1)
+				{
+					switch (index)
+					{
+					case 0: spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x] * 10) + (xSpace(buildGrid[y][x] * 10) / 2), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10) + (ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10) / 2)); break;
+					case 1: spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x + 1] * 10) + (xSpace(buildGrid[y][x + 1] * 10) / 2), ySpace((buildGrid[y][x] + y + 2 - x) * 10) + (ySpace((buildGrid[y][x] + y + 2 - x) * 10) / 2)); break;
+					case 2: spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x] * 10) + (xSpace(buildGrid[y][x] * 10) / 2), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10) + (ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10) / 2)); break;
+					case 3: spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x - 1] * 10) + (xSpace(buildGrid[y][x - 1] * 10) / 2), ySpace((buildGrid[y][x] + y + 2 - x) * 10) + (ySpace((buildGrid[y][x] + y + 2 - x) * 10) / 2)); break;
+					}
+				}
+			}
+		}
+
+		if (money < b_InvaderBarracks.getCost()) { canBuildBarracks = false; }
+
+		if (canBuildBarracks)
+		{
+			
+		}
+	}
 }
 void ai_Run(float updateTime)
 {
@@ -348,8 +544,6 @@ void ai_Run(float updateTime)
 		tmr_Update = 0.0f;
 
 		playerUnits = ai_CPU();
-		playerUnitsNearMe = ai_CPUNB(false);
-		attackingPlayerUnits = ai_CPUNB(true);
 		units = ai_CU();
 		idleUnits = ai_CUDT(IDLE);
 		unitAttackers = ai_CUDT(FIGHT_UNITS);
@@ -359,6 +553,7 @@ void ai_Run(float updateTime)
 		towers = ai_CT();
 
 		ai_CalcUnits();
+		ai_CalcBuilds();
 	}
 	else { tmr_Update += getDeltaTime(); }
 

@@ -160,9 +160,9 @@ void drawGameOverlay()
 			m_EntOverlay[9].setClickable(false);
 			m_EntOverlay[10].setClickable(false);
 			m_EntOverlay[10].setName(cnt);
+			m_EntOverlay[11].setName(train);
 			m_EntOverlay[11].setXPos(m_EntOverlay[10].getXPos() + ((strlen(m_EntOverlay[10].getName()) + 1) * 9 * 3));
 			m_EntOverlay[12].setXPos(m_EntOverlay[11].getXPos() + (strlen(m_EntOverlay[11].getName()) * 9));
-			m_EntOverlay[11].setName(train);
 		}
 		else { m_EntOverlay[7].setName('\0'); }
 		switch (drawMenu(m_EntOverlay))
@@ -196,7 +196,7 @@ void drawGameOverlay()
 		m_PlyrOverlay[6].setName(hp);
 		m_PlyrOverlay[1].setName(money);
 
-		//m_PlyrOverlay[0].setClickable(true);
+		m_PlyrOverlay[0].setClickable(true);
 
 		switch (drawMenu(m_PlyrOverlay))
 		{

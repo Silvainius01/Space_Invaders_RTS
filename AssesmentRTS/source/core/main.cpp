@@ -216,7 +216,7 @@ void main()
 	initUI();
 	initEnts();
 	initBuildGrid();
-	//debug = true;
+	debug = true;
 
 	float tempTimer = 0.0f;
 

@@ -139,12 +139,11 @@ void checkCollision(Unit &u, int index, bool isBuild = false)
 		}
 	}
 }
-void getCollisionCandidates(Unit &u)
+void getCollisionCandidates(Unit &u, bool checkBuilds = false)
 {
 	float r;
 	float dist;
-	bool checkBuilds = false;
-	int spawnIndex = unitSpawnIndex;
+	int spawnIndex = 1;
 	PosDim rupd = u.getPosDim();
 	PosDim ucpd;
 
@@ -153,16 +152,25 @@ void getCollisionCandidates(Unit &u)
 
 	for (int a = 0; a < spawnIndex; a++)
 	{
-		if (checkBuilds) { ucpd = b_Current.getPosDim(); }
-		else { ucpd = u_Current.getPosDim(); }
-		if (u_Current == u_Empty || rupd == ucpd) { continue; }
+		if (checkBuilds) { ucpd = b_Current.getPosDim(); spawnIndex = buildSpawnIndex; }
+		else { ucpd = u_Current.getPosDim(); spawnIndex = unitSpawnIndex; }
+		
+		if (checkBuilds) { if (b_Current == b_Empty) { continue; } }
+		else { if (u_Current == u_Empty || rupd == ucpd) { continue; } }
 
 		dist = sqrt(expo<float>(abs(rupd.x - ucpd.x), 2) + expo<float>(abs(rupd.y - ucpd.y), 2));
 
 		if (dist <= r)
 		{
-			checkCollision(u, a, true);
+			if (checkBuilds) { checkCollision(u, a, true); }
 			checkCollision(u, a);
+			if (u.hasUnitCollided()) { a = spawnIndex; }
+		}
+
+		if (a == spawnIndex - 1 && !checkBuilds)
+		{
+			checkBuilds = true;
+			a = 0;
 		}
 	}
 }
