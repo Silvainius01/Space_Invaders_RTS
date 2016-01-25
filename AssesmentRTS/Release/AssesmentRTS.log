@@ -1,67 +1,73 @@
-﻿Build started 12/7/2015 5:16:23 PM.
-     1>Project "D:\Programming\School\Assesments\AssesmentRTS\AssesmentRTS\AssesmentRTS.vcxproj" on node 2 (Rebuild target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt source\core\Game\player.cpp source\core\ent\ent.cpp source\core\ent\entBuild.cpp source\core\ent\entBullet.cpp source\core\ent\entUnit.cpp source\core\fileio\save.cpp source\core\Game\AI.cpp source\core\Game\Generate.cpp source\core\main.cpp source\core\MATH.cpp source\core\ui\input.cpp source\core\ui\menu.cpp source\core\ui\overlay.cpp source\core\ui\ui.cpp
-         player.cpp
-         ent.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ent\ent.cpp(52): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ent\ent.cpp(53): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ent\ent.cpp(54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ent\ent.cpp(55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ent\ent.cpp(280): warning C4101: 'save': unreferenced local variable
-         entBuild.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ent\entBuild.cpp(49): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entBuild.cpp(50): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entBuild.cpp(51): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entBuild.cpp(71): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entBuild.cpp(72): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entBuild.cpp(73): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-         entBullet.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-         entUnit.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\./ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ent\entUnit.cpp(62): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entUnit.cpp(63): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entUnit.cpp(78): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entUnit.cpp(79): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\ent\entUnit.cpp(172): warning C4390: ';': empty controlled statement found; is this the intent?
-     1>source\core\ent\entUnit.cpp(292): warning C4390: ';': empty controlled statement found; is this the intent?
-         save.cpp
-         AI.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\Game\AI.cpp(94): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-         Generate.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-         main.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\./ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\main.cpp(215): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
-     1>source\core\main.cpp(260): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\main.cpp(264): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-     1>source\core\main.cpp(275): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-     1>source\core\main.cpp(277): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-     1>source\core\main.cpp(279): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-         MATH.cpp
-         input.cpp
-     1>source\core\ui\input.cpp(1): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-         menu.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\menu.cpp(88): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\menu.cpp(96): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\menu.cpp(146): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-         overlay.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\overlay.cpp(21): warning C4018: '<': signed/unsigned mismatch
-     1>source\core\ui\overlay.cpp(125): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-         ui.cpp
-     1>d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\ui.cpp(44): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ui\ui.cpp(148): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\ui.cpp(149): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ui\ui.cpp(160): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\ui.cpp(168): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-     1>source\core\ui\ui.cpp(170): warning C4018: '<': signed/unsigned mismatch
-     1>source\core\ui\ui.cpp(184): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\ui.cpp(190): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>source\core\ui\ui.cpp(203): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+﻿  player.cpp
+  ent.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ent\ent.cpp(52): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+source\core\ent\ent.cpp(53): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+source\core\ent\ent.cpp(54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+source\core\ent\ent.cpp(55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+source\core\ent\ent.cpp(280): warning C4101: 'save': unreferenced local variable
+  entBuild.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ent\entBuild.cpp(49): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entBuild.cpp(50): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entBuild.cpp(51): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entBuild.cpp(71): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entBuild.cpp(72): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entBuild.cpp(73): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+  entBullet.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  entUnit.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ent\./ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ent\entUnit.cpp(62): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entUnit.cpp(63): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entUnit.cpp(78): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entUnit.cpp(79): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\ent\entUnit.cpp(172): warning C4390: ';': empty controlled statement found; is this the intent?
+source\core\ent\entUnit.cpp(292): warning C4390: ';': empty controlled statement found; is this the intent?
+  save.cpp
+  AI.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\Game\AI.cpp(94): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  Generate.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\game\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  main.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\./ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\main.cpp(215): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+source\core\main.cpp(260): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\main.cpp(264): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+source\core\main.cpp(275): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+source\core\main.cpp(277): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+source\core\main.cpp(279): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+  MATH.cpp
+  input.cpp
+source\core\ui\input.cpp(1): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  menu.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ui\menu.cpp(88): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ui\menu.cpp(96): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+source\core\ui\menu.cpp(146): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  overlay.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ui\overlay.cpp(21): warning C4018: '<': signed/unsigned mismatch
+source\core\ui\overlay.cpp(125): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  ui.cpp
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(296): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+source\core\ui\ui.cpp(44): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+source\core\ui\ui.cpp(148): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+source\core\ui\ui.cpp(149): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+source\core\ui\ui.cpp(160): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+source\core\ui\ui.cpp(168): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+source\core\ui\ui.cpp(170): warning C4018: '<': signed/unsigned mismatch
+source\core\ui\ui.cpp(184): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+source\core\ui\ui.cpp(190): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+source\core\ui\ui.cpp(203): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  Generating code
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\ui.cpp(65): warning C4715: 'itc': not all control paths return a value
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\menu.cpp(170): warning C4715: 'getSelectedColor': not all control paths return a value
+d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\math.h(26): warning C4715: 'expo<float>': not all control paths return a value
+  All 826 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+sfw.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+sfw.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+sfw.lib(crenderutils.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(crenderutils.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+  AssesmentRTS.vcxproj -> D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe
