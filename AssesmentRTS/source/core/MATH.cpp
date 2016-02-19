@@ -15,3 +15,11 @@ int getHundredsPlace(int num)
 	num /= 100;
 	return num;
 }
+
+int getThousandsPlace(int num)
+{
+	num %= 10000;
+	num -= (num % 1000);
+	num /= 1000;
+	return num;
+}

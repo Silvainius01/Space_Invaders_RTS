@@ -16,6 +16,12 @@ float	Unit::getSavedX()				{ return saveTX; }
 float	Unit::getSavedY()				{ return saveTY; }
 float	Unit::getAttackSpeed()			{ return atkSpeed; }
 float	Unit::getLastAtk()				{ return lastAtk; }
+float	Unit::getDistToTar()
+{
+	return abs(
+		sqrt(expo<float>(pd.x, 2) + expo<float>(pd.y, 2)) - 
+		sqrt(expo<float>(u_AllDynam[u_Target].getPosDim().x, 2) + expo<float>(u_AllDynam[u_Target].getPosDim().y, 2)));
+}
 bool	Unit::isUnitMoving()			{ return moving; }
 bool	Unit::doesUnitHaveSlope()		{ return hasSlope; }
 bool	Unit::doesUnitHaveSavedCoords() { return hasSavedCoords; }
@@ -61,6 +67,7 @@ float getUnitW(Unit &u)
 	{
 	case 0: return wi_Human;
 	case 1: return wi_Invader;
+	case 2: return wi_Hotdog;
 	default: cout << "\nDefaulted with: " << idMatch; return 9;
 	}
 }
@@ -77,6 +84,7 @@ float getUnitH(Unit &u)
 	{
 	case 0: return hi_Human;
 	case 1: return hi_Invader;
+	case 2: return hi_Hotdog;
 	default: cout << "\nDefaulted with: " << idMatch; return 9;
 	}
 }
@@ -137,28 +145,16 @@ void shootTarget(Unit &u)
 		{
 
 			if (u_Targeted == u_Empty || u == u_Targeted) { u.setTargetStatus(false); u.setTargetInRange(false); }
-			else { blerg = u_AllDynam[u.getTargetedUnit()].getPosDim(); inited = true; }
+			else { blerg = u_Targeted.getPosDim(); inited = true; }
 		}
 		else
 		{
 			if (b_Targeted == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
-			if (u == u_Human)
+			if (b_Targeted.getOwner() == u.getOwner())
 			{
-				if (b_Targeted == b_HumanBarracks || b_Targeted == b_HumanTC || b_Targeted == b_HumanTower)
-				{
-					u.setTargetStatus(false); u.setTargetInRange(false);
-				}
-				else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+				u.setTargetStatus(false); u.setTargetInRange(false);
 			}
-			else if (u == u_Invader)
-			{
-				if (b_Targeted == b_InvaderBarracks || b_Targeted == b_InvaderTC || b_Targeted == b_InvaderTower)
-				{
-					u.setTargetStatus(false); u.setTargetInRange(false);
-				}
-				else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
-			}
-			
+			else { blerg = b_Targeted.getPosDim(); inited = true; }			
 		}
 
 		if (inited)
@@ -192,63 +188,29 @@ void findTarget(Unit &u)
 	switch (u.getTarget())
 	{
 	case UNITS:
-		if (u == u_Human)
+		for (int a = 0; a < unitSpawnIndex; a++)
 		{
-			for (int a = 0; a < unitSpawnIndex; a++)
+			if (u_Current.getOwner() == u.getOwner() || u_Current == u_Empty) { continue; }
+			else
 			{
-				if (u_Current == u_Human || u_Current == u_Empty) { continue; }
-				else
-				{
-					float comp;
-					blerg = u_Current.getPosDim();
-					comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-					if (comp < dist) { dist = comp; u.setTargetedUnit(a); closest = blerg; }
-				}
-			}
-		}
-		else
-		{
-			for (int a = 0; a < unitSpawnIndex; a++)
-			{
-				if (u_Current == u_Invader || u_Current == u_Empty) { continue; }
-				else
-				{
-					float comp;
-					blerg = u_Current.getPosDim();
-					comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-					if (comp < dist) { dist = comp; u.setTargetedUnit(a); closest = blerg; }
-				}
+				float comp;
+				blerg = u_Current.getPosDim();
+				comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
+				if (comp < dist) { dist = comp; u.setTargetedUnit(a); closest = blerg; }
 			}
 		}
 		u.setTargetCoords(closest.x, closest.y);
 		break;
 	case BUILDINGS:
-		if (u == u_Human)
+		for (int a = 0; a < buildSpawnIndex; a++)
 		{
-			for (int a = 0; a < buildSpawnIndex; a++)
+			if (b_Current.getOwner() == u.getOwner() || b_Current == b_Empty) { continue; }
+			else
 			{
-				if (b_Current == b_HumanBarracks || b_Current == b_HumanTC || b_Current == b_HumanTower || b_Current == b_Empty) { continue; }
-				else
-				{
-					float comp;
-					blerg = b_Current.getPosDim();
-					comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-					if (comp < dist) { dist = comp; u.setTargetedBuild(a); closest = blerg; }
-				}
-			}
-		}
-		else
-		{
-			for (int a = 0; a < buildSpawnIndex; a++)
-			{
-				if (b_Current == b_InvaderBarracks || b_Current == b_InvaderTC || b_Current == b_InvaderTower || b_Current == b_Empty) { continue; }
-				else
-				{
-					float comp;
-					blerg = b_Current.getPosDim();
-					comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-					if (comp < dist) { dist = comp; u.setTargetedBuild(a); closest = blerg; }
-				}
+				float comp;
+				blerg = b_Current.getPosDim();
+				comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
+				if (comp < dist) { dist = comp; u.setTargetedBuild(a); closest = blerg; }
 			}
 		}
 		u.setTargetCoords(closest.x, closest.y);

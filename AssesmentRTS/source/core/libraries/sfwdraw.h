@@ -118,7 +118,7 @@ namespace sfw
 	// steps	: how smooth is the surface? Larger radii should use larger step sizes
 	// tint			  : hex color value
 	// transform	  : a 4x4 transformation matrix, applied as parent transform
-	void drawCircle(float x, float y, float radius, unsigned steps = 12, unsigned tint = 0xffffffff, const float transform[16] = identity);
+	void drawCircle(float x, float y, float radius,  unsigned steps = 12, unsigned tint = 0xffffffff, const float transform[16] = identity);
 
 	// used to initialize an openGL rendering context. USE THIS BEFORE ANYTHING ELSE!
 	// width, height	: Dimensions of window.

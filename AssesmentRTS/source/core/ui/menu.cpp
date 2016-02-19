@@ -74,7 +74,9 @@ Button m_Clr[11] = {Button("COLOR", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER,
 Button m_End[3] = { Button("You Lost", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
 					Button("Main Menu", xSpace(50), ySpace(60), 3, 3), Button() };
 
-int drawMenu(Button *b, int indexLimiter)
+Button m_ChatBox[2] = { Button("\0", xSpace(5), ySpace(70), 3, 3, WHITE, RIGHT, false), Button() };
+
+int drawMenu(Button *b, int indexLimiter, bool constHighlight)
 {
 	int choice = -1;
 	int adjustment = 1;
@@ -101,6 +103,8 @@ int drawMenu(Button *b, int indexLimiter)
 		case LEFT:
 			break;
 		}
+
+		if (constHighlight) { drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, MAGENTA); }
 
 		if (mY <= b[a].getYPos() && mY >= b[a].getYPos() - height)
 		{

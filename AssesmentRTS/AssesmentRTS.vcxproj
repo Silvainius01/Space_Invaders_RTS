@@ -134,6 +134,9 @@
     <ClInclude Include="source\core\ui\ui.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\core\ent\entResource.cpp" />
+    <ClCompile Include="source\core\Game\cheats.cpp" />
+    <ClCompile Include="source\core\Game\HumanAI.cpp" />
     <ClCompile Include="source\core\Game\player.cpp" />
     <ClCompile Include="source\core\ent\ent.cpp" />
     <ClCompile Include="source\core\ent\entBuild.cpp" />

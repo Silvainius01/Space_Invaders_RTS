@@ -5,6 +5,7 @@ using namespace std;
 
 bool isUnitOnOverlay = false;
 bool isBuildOnOverlay = false;
+bool isResourceOnOverlay = false;
 
 int overrideMouse = -1;
 int entOnOverlay = 0;
@@ -20,6 +21,10 @@ unsigned ui_Tower;
 unsigned ui_Barracks;
 unsigned ui_Overlay;
 unsigned ui_Mouse;
+unsigned ui_Background;
+unsigned ui_Hotdog;
+unsigned ui_Resource;
+unsigned ui_Collector;
 unsigned mouseTint = CYAN;
 
 float xSpace(float num, float den) { return (SCREEN[0] / den) * num; }
@@ -28,13 +33,17 @@ float ySpace(float num, float den) { return (SCREEN[1] / den) * num; }
 void initUI()
 {
 	ui_Text = loadTextureMap("./source/assets/text.png", 13, 5);
-	ui_Human = loadTextureMap("./source/assets/human.png");
-	ui_Invader = loadTextureMap("./source/assets/invader.png", 2, 2);
-	ui_TownCenter = loadTextureMap("./source/assets/town_center.png", 1, 2);
-	ui_Tower = loadTextureMap("./source/assets/Tower.png", 2);
-	ui_Barracks = loadTextureMap("./source/assets/barracks.png");
+	ui_Human = loadTextureMap("./source/assets/human.png", 2);
+	ui_Invader = loadTextureMap("./source/assets/invader.png", 4, 2);
+	ui_TownCenter = loadTextureMap("./source/assets/town_center.png", 2, 2);
+	ui_Tower = loadTextureMap("./source/assets/Tower.png", 2, 2);
+	ui_Barracks = loadTextureMap("./source/assets/barracks.png", 2);
 	ui_Overlay = loadTextureMap("./source/assets/overlay.png");
+	ui_Background = loadTextureMap("./source/assets/background.png");
+	ui_Hotdog = loadTextureMap("./source/assets/hotdog.png", 2);
+	ui_Resource = loadTextureMap("./source/assets/resources.png", 1, 2);
 }
+
 void initBuildGrid()
 {
 	for (int y = 0; y < gridY; y++)
@@ -61,6 +70,102 @@ char itc(int a)
 	case 8: return '8';
 	case 9: return '9';
 	case 0: return '0';
+	}
+}
+char ktc(int index, bool shift)
+{
+	switch (index)
+	{
+	case 0:
+		if (shift) { return 'A'; }
+		return 'a';
+	case 1:
+		if (shift) { return 'B'; }
+		return 'b';
+	case 2:
+		if (shift) { return 'C'; }
+		return 'c';
+	case 3:
+		if (shift) { return 'D'; }
+		return 'd';
+	case 4:
+		if (shift) { return 'E'; }
+		return 'e';
+	case 5:
+		if (shift) { return 'F'; }
+		return 'f';
+	case 6:
+		if (shift) { return 'G'; }
+		return 'g';
+	case 7:
+		if (shift) { return 'H'; }
+		return 'h';
+	case 8:
+		if (shift) { return 'I'; }
+		return 'i';
+	case 9:
+		if (shift) { return 'J'; }
+		return 'j';
+	case 10:
+		if (shift) { return 'K'; }
+		return 'k';
+	case 11:
+		if (shift) { return 'L'; }
+		return 'l';
+	case 12:
+		if (shift) { return 'M'; }
+		return 'm';
+	case 13:
+		if (shift) { return 'N'; }
+		return 'n';
+	case 14:
+		if (shift) { return 'O'; }
+		return 'o';
+	case 15:
+		if (shift) { return 'P'; }
+		return 'p';
+	case 16:
+		if (shift) { return 'Q'; }
+		return 'q';
+	case 17:
+		if (shift) { return 'R'; }
+		return 'r';
+	case 18:
+		if (shift) { return 'S'; }
+		return 's';
+	case 19:
+		if (shift) { return 'T'; }
+		return 't';
+	case 20:
+		if (shift) { return 'U'; }
+		return 'u';
+	case 21:
+		if (shift) { return 'V'; }
+		return 'v';
+	case 22:
+		if (shift) { return 'W'; }
+		return 'w';
+	case 23:
+		if (shift) { return 'X'; }
+		return 'x';
+	case 24:
+		if (shift) { return 'Y'; }
+		return 'y';
+	case 25:
+		if (shift) { return 'Z'; }
+		return 'z';
+	case 26:return '0';
+	case 27:return '1';
+	case 28:return '2';
+	case 29:return '3';
+	case 30:return '4';
+	case 31:return '5';
+	case 32:return '6';
+	case 33:return '7';
+	case 34:return '8';
+	case 35:return '9';
+	case 47:return ' ';
+	default: return '\0';
 	}
 }
 int cti(char a)
@@ -252,22 +357,24 @@ void drawBuildGrid()
 
 		if (b_Current == b_HumanTower)
 		{
-			if (y + 1 != 8)
+			if (y + 1 < 8)
 			{
 				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10), GREEN);
 				bat[y + 1][x] = 2;
 			}
-			if (y - 1 != -1)
+			if (y - 1 > -1)
 			{
 				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10), GREEN);
+
+
 				bat[y - 1][x] = 2;
 			}
-			if (x + 1 != 10)
+			if (x + 1 < 10)
 			{
 				drawBox(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
 				bat[y][x + 1] = 2;
 			}
-			if (x - 1 != -1)
+			if (x - 1 > -1)
 			{
 				drawBox(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
 				bat[y][x - 1] = 2;

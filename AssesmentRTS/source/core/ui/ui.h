@@ -90,10 +90,12 @@ extern Button m_Ctrl[5];
 extern Button m_Scrn[5];
 extern Button m_Clr[11];
 extern Button m_End[3];
+extern Button m_ChatBox[2];
 
 
 extern bool isUnitOnOverlay;
 extern bool isBuildOnOverlay;
+extern bool isResourceOnOverlay;
 
 extern int overrideMouse;
 extern int entOnOverlay;
@@ -114,24 +116,35 @@ extern unsigned ui_TownCenter;
 extern unsigned ui_Tower;
 extern unsigned ui_Barracks;
 extern unsigned ui_Overlay;
+extern unsigned ui_Background;
+extern unsigned ui_Hotdog;
+extern unsigned ui_Resource;
+extern unsigned ui_Collector;
 
 #define wi_Text			getTextureWidth(ui_Text) / 13
 #define hi_Text			getTextureHeight(ui_Text) / 4
-#define wi_Human		getTextureWidth(ui_Human) * 2
+#define wi_Human		(getTextureWidth(ui_Human) / 2) * 2
 #define hi_Human		getTextureHeight(ui_Human) * 2
-#define wi_Invader	   (getTextureWidth(ui_Invader) / 4) * 6
-#define hi_Invader	   (getTextureHeight(ui_Invader) / 4) * 6
-#define wi_TownCenter	getTextureWidth(ui_TownCenter) * 4
+#define wi_Invader		(getTextureWidth(ui_Invader) / 8) * 6
+#define hi_Invader		(getTextureHeight(ui_Invader) / 4) * 6
+#define wi_TownCenter	(getTextureWidth(ui_TownCenter) / 2) * 4
 #define hi_TownCenter	(getTextureHeight(ui_TownCenter) / 2) * 4
 #define wi_Tower		(getTextureWidth(ui_Tower) / 2) * 3
-#define hi_Tower		getTextureHeight(ui_Tower) * 3
-#define wi_Barracks		getTextureWidth(ui_Barracks) * 2
+#define hi_Tower		(getTextureHeight(ui_Tower) / 2) * 3.25
+#define wi_Barracks		getTextureWidth(ui_Barracks)
 #define hi_Barracks		getTextureHeight(ui_Barracks) * 2
 #define wi_Overlay		(SCREEN[0] / getTextureWidth(ui_Overlay)) 
 #define hi_Overlay		(SCREEN[1] / getTextureHeight(ui_Overlay))
+#define wi_Hotdog		(getTextureWidth(ui_Hotdog) / 2) * 3
+#define hi_Hotdog		getTextureHeight(ui_Hotdog) * 3
+#define wi_Food			getTextureWidth(ui_Resource) * (9 / 3)
+#define hi_Food			(getTextureHeight(ui_Resource) / 2) * 3
+#define wi_Steel		getTextureWidth(ui_Resource) * (8 / 3)
+#define hi_Steel		(getTextureHeight(ui_Resource) / 2) * 3
 
 extern int cti(char a);
 extern char itc(int a);
+extern char ktc(int index, bool shift);
 
 extern void initUI();
 extern void initBuildGrid();
@@ -140,7 +153,7 @@ extern void drawBox(float x, float y, float h, float w, unsigned tint = WHITE);
 extern void drawMouse(unsigned sprite = ui_Text, int index = 49, float h = hi_Text, float w = wi_Text, float multH = 3, float multW = 3);
 extern void drawBuildGrid();
 
-extern int drawMenu(Button *b, int indexLimiter = -1);
+extern int drawMenu(Button *b, int indexLimiter = -1, bool constHighlight = false);
 extern int getSelectedColor();
 extern void drawGameOverlay();
 extern void drawSelBox(Button b, unsigned forceTint = NONE);

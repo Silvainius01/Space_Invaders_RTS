@@ -29,19 +29,6 @@ void spawnBullet(Unit u, float tx, float ty)
 	bool isIndexOpen = false;
 	int openIndex;
 
-	switch (u.getID())
-	{
-	case 0:
-		blt = blt_Human;
-		break;
-	case 1:
-		blt = blt_Invader;
-		break;
-	default:
-		blt = blt_Empty;
-		break;
-	}
-
 	for (int a = 0; a < bulletSpawnIndex; a++)
 	{
 		if (blt_Current == blt_Empty)
@@ -64,31 +51,14 @@ void spawnBullet(Unit u, float tx, float ty)
 		delete[] temp;
 	}
 
-	blt_AllDynam[openIndex] = blt;
-	blt_AllDynam[openIndex].setPosDim({ unitPosDim.x, unitPosDim.y, 1, 1 });
-	blt_AllDynam[openIndex].setTargetCoords(tx, ty);
-	blt_AllDynam[openIndex].setDMG(u.getDMG());
+	blt_AllDynam[openIndex] = Bullet(0, u.getOwner(), unitPosDim, tx, ty, 75.0f, u.getDMG());
 }
 
 void spawnBullet(Building b, float tx, float ty)
 {
 	PosDim unitPosDim = b.getPosDim();
-	Bullet blt;
 	bool isIndexOpen = false;
 	int openIndex;
-
-	switch (b.getID())
-	{
-	case 1:
-		blt = blt_Human;
-		break;
-	case 4:
-		blt = blt_Invader;
-		break;
-	default:
-		blt = blt_Empty;
-		break;
-	}
 
 	for (int a = 0; a < bulletSpawnIndex; a++)
 	{
@@ -112,10 +82,7 @@ void spawnBullet(Building b, float tx, float ty)
 		delete[] temp;
 	}
 
-	blt_AllDynam[openIndex] = blt;
-	blt_AllDynam[openIndex].setPosDim({ unitPosDim.x, unitPosDim.y, 1, 1 });
-	blt_AllDynam[openIndex].setTargetCoords(tx, ty);
-	blt_AllDynam[openIndex].setDMG(b.getDMG());
+	blt_AllDynam[openIndex] = Bullet(0, b.getOwner(), unitPosDim, tx, ty, 75.0f, b.getDMG());
 }
 
 void moveBullet(Bullet &blt)
@@ -165,55 +132,27 @@ void checkCollision(Bullet &u, int index, bool isBuild = false)
 	{
 		if (ua[0].y + (ua[0].h / 2) >= ua[1].y - (ua[1].h / 2) && ua[0].y - (ua[0].h / 2) <= ua[1].y + (ua[1].h / 2))
 		{
-			u = blt_Empty;
 			if (isBuild) { b_AllDynam[index].setHP(b_AllDynam[index].getHP() - u.getDMG()); }
 			else { u_AllDynam[index].setHP(u_AllDynam[index].getHP() - u.getDMG()); }
+			u = blt_Empty;
 		}
 	}
 }
 void bulletCollision()
 {
-	bool isBulletHuman;
-
 	for (int a = 0; a < bulletSpawnIndex; a++)
 	{
 		PosDim pd = blt_Current.getPosDim();
-		switch (blt_Current.getID())
-		{
-		case 0: case 2:
-			isBulletHuman = true;
-			break;
-		case 1: case 3:
-			isBulletHuman = false;
-			break;
-		default: continue;
-		}
 
-		if (isBulletHuman)
+		for (int b = 0; b < unitSpawnIndex; b++)
 		{
-			for (int b = 0; b < unitSpawnIndex; b++)
-			{
-				if (u_AllDynam[b] == u_Human) { continue; }
-				else { checkCollision(blt_Current, b); }
-			}
-			for (int b = 0; b < buildSpawnIndex; b++)
-			{
-				if (b_AllDynam[b] == b_HumanBarracks || b_AllDynam[b] == b_HumanTC || b_AllDynam[b] == b_HumanTower) { continue; }
-				else { checkCollision(blt_Current, b, true); }
-			}
+			if (u_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
+			else { checkCollision(blt_Current, b); }
 		}
-		else
+		for (int b = 0; b < buildSpawnIndex; b++)
 		{
-			for (int b = 0; b < unitSpawnIndex; b++)
-			{
-				if (u_AllDynam[b] == u_Invader) { continue; }
-				else { checkCollision(blt_Current, b); }
-			}
-			for (int b = 0; b < buildSpawnIndex; b++)
-			{
-				if (b_AllDynam[b] == b_InvaderBarracks || b_AllDynam[b] == b_InvaderTC || b_AllDynam[b] == b_InvaderTower) { continue; }
-				else { checkCollision(blt_Current, b, true); }
-			}
+			if (b_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
+			else { checkCollision(blt_Current, b, true); }
 		}
 	}
 }

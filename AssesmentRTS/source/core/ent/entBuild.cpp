@@ -77,23 +77,34 @@ float getBuildH(Building &b)
 
 void checkForTargets(Building &b)
 {
-	float dist = xSpace(101);
+	float Dist = xSpace(101);
 	float comp = xSpace(101);
-	PosDim unitPD;
+	PosDim targetPD = { 0, 0, -1 , -1 };
 	PosDim closest;
 	PosDim buildPD = b.getPosDim();
 
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Empty) { continue; }
-		if (b == b_InvaderTower && u_Current == u_Invader) { continue; } 
-		if (b == b_HumanTower && u_Current == u_Human) { continue; } 
-
+		if (b.getOwner() == u_Current.getOwner() || u_Current == u_Empty) { continue; }
 		else
 		{
-			unitPD = u_Current.getPosDim();
-			dist = sqrt(expo<float>(abs(buildPD.x - unitPD.x), 2) + expo<float>(abs(buildPD.y - unitPD.y), 2));
-			if (dist < comp) { comp = dist; closest = unitPD; }
+			targetPD = u_Current.getPosDim();
+			Dist = sqrt(expo<float>(abs(buildPD.x - targetPD.x), 2) + expo<float>(abs(buildPD.y - targetPD.y), 2));
+			if (Dist < comp) { comp = Dist; closest = targetPD; }
+		}
+	}
+
+	if (Dist > b.getAtkRad())
+	{
+		for (int a = 0; a < buildSpawnIndex; a++)
+		{
+			if (b.getOwner() == b_Current.getOwner() || b_Current == b_Empty) { continue; }
+			else
+			{
+				targetPD = b_Current.getPosDim();
+				Dist = dist(buildPD, targetPD);
+				if (Dist < comp) { comp = Dist; closest = targetPD; }
+			}
 		}
 	}
 
@@ -191,15 +202,7 @@ void updateQueue(Building &b)
 
 	if (b.queue[0] == -1) { return; }
 
-	if (b == b_HumanBarracks)
-	{
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Human) { trainTime += 0.25f; } }
-	}
-	else if (b == b_InvaderBarracks)
-	{
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader) { trainTime += 0.25f; } }
-	}
-	else { return; }
+	for (int a = 0; a < unitSpawnIndex; a++) { if (b.getOwner() == u_Current.getOwner()) { trainTime += 0.25f; } }
 
 	b.setTrainTime(trainTime);
 

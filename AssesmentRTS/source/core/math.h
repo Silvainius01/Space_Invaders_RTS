@@ -26,5 +26,5 @@ T expo(const T base, const T power)
 }
 
 extern int getTensPlace(int num);
-
 extern int getHundredsPlace(int num);
+extern int getThousandsPlace(int num);

@@ -12,6 +12,7 @@ using namespace std;
 
 #define u_EntOnOverlay u_AllDynam[entOnOverlay]
 #define b_EntOnOverlay b_AllDynam[entOnOverlay]
+#define r_EntOnOverlay r_AllDynam[entOnOverlay]
 
 char *doTheThingToProfName()
 {
@@ -46,10 +47,12 @@ Button m_EntOverlay[] =	   {Button("Default", xSpace(50), ySpace(7.5), 2, 2, WHI
 							Button() };
 
 Button m_PlyrOverlay[] = {  Button("Money:", xSpace(5), ySpace(14), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[0].getXPos() + (strlen(m_PlyrOverlay[0].getName()) * 9 * 3), m_PlyrOverlay[0].getYPos(), m_PlyrOverlay[0].getHeight(), m_PlyrOverlay[0].getWidth(), GREEN, RIGHT, false),
+							Button("Steel:", xSpace(5), ySpace(11.5), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[2].getXPos() + (strlen(m_PlyrOverlay[2].getName()) * 9 * 3), m_PlyrOverlay[2].getYPos(), m_PlyrOverlay[2].getHeight(), m_PlyrOverlay[2].getWidth(), 0x8c8888, RIGHT, false),
+							Button("Food :", xSpace(5), ySpace(9), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[4].getXPos() + (strlen(m_PlyrOverlay[4].getName()) * 9 * 3), m_PlyrOverlay[4].getYPos(), m_PlyrOverlay[4].getHeight(), m_PlyrOverlay[4].getWidth(), RED, RIGHT, false),
 							Button("Buy:", xSpace(63), ySpace(14), 2, 2, WHITE, RIGHT, false),
 							Button("Barracks", xSpace(63), ySpace(11.5), 2, 2, WHITE, RIGHT),
 							Button("Tower", xSpace(63), ySpace(9), 2, 2, WHITE, RIGHT),
-							Button("Cost: ", xSpace(63), ySpace(6.5), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[5].getXPos() + (strlen(m_PlyrOverlay[5].getName()) * 9 * 3), m_PlyrOverlay[5].getYPos(), m_PlyrOverlay[5].getHeight(), m_PlyrOverlay[5].getWidth(), GREEN, RIGHT, false),
+							Button("Cost: ", xSpace(63), ySpace(6.5), 2, 2, WHITE, RIGHT, false), Button("NV", m_PlyrOverlay[9].getXPos() + (strlen(m_PlyrOverlay[9].getName()) * 9 * 3), m_PlyrOverlay[9].getYPos(), m_PlyrOverlay[9].getHeight(), m_PlyrOverlay[9].getWidth(), GREEN, RIGHT, false),
 							Button() };
 
 void drawGameOverlay()
@@ -57,6 +60,9 @@ void drawGameOverlay()
 	drawTexture(ui_Overlay, xSpace(50), ySpace(50), xSpace(1, 1), ySpace(1, 1));
 	m_EntOverlay[6].setTint(playerColor);
 	m_EntOverlay[6].setName(profileName);
+	m_EntOverlay[1].setName("HP :");
+	m_EntOverlay[3].setName("DMG:");
+	m_EntOverlay[5].setName("OWner:");
 
 	if (isUnitOnOverlay)
 	{
@@ -70,7 +76,7 @@ void drawGameOverlay()
 		m_EntOverlay[0].setName(u_EntOnOverlay.getName());
 		m_EntOverlay[2].setName(hp);
 		m_EntOverlay[4].setName(dmg);
-		if (u_EntOnOverlay == u_Invader) { m_EntOverlay[6].setName("Invaders"); m_EntOverlay[6].setTint(RED); }
+		if (u_EntOnOverlay.getOwner() == 1) { m_EntOverlay[6].setName("Invaders"); m_EntOverlay[6].setTint(p_AI.getPlayerColor()); }
 		else { m_EntOverlay[6].setTint(playerColor); m_EntOverlay[6].setName(profileName); }
 		m_EntOverlay[7].setName("Target:");
 		m_EntOverlay[8].setName("Nothing");
@@ -80,46 +86,48 @@ void drawGameOverlay()
 		switch (u_EntOnOverlay.getTarget())
 		{
 		case NOTHING:
-			m_EntOverlay[8].setTint(MAGENTA), m_EntOverlay[8].setClickable(false);
-			m_EntOverlay[9].setTint(WHITE), m_EntOverlay[9].setClickable(true);
-			m_EntOverlay[10].setTint(WHITE), m_EntOverlay[10].setClickable(true);
+			m_EntOverlay[8].setTint(MAGENTA); m_EntOverlay[8].setClickable(false);
+			m_EntOverlay[9].setTint(WHITE);  
+			if (u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[9].setClickable(true); }
+			else { m_EntOverlay[9].setClickable(false); }
+			m_EntOverlay[10].setTint(WHITE); 
+			if(u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[10].setClickable(true); }
+			else { m_EntOverlay[10].setClickable(false); }
 			break;
 		case UNITS:
-			m_EntOverlay[8].setTint(WHITE), m_EntOverlay[8].setClickable(true);
+			m_EntOverlay[8].setTint(WHITE); 
+			if (u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[8].setClickable(true); }
+			else { m_EntOverlay[8].setClickable(false); }
 			m_EntOverlay[9].setTint(MAGENTA), m_EntOverlay[9].setClickable(false);
-			m_EntOverlay[10].setTint(WHITE), m_EntOverlay[10].setClickable(true);
+			m_EntOverlay[10].setTint(WHITE); 
+			if (u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[10].setClickable(true); }
+			else { m_EntOverlay[10].setClickable(false); }
 			break;
 		case BUILDINGS:
-			m_EntOverlay[8].setTint(WHITE), m_EntOverlay[8].setClickable(true);
-			m_EntOverlay[9].setTint(WHITE), m_EntOverlay[9].setClickable(true);
+			m_EntOverlay[8].setTint(WHITE);
+			if (u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[8].setClickable(true); }
+			else { m_EntOverlay[8].setClickable(false); }
+			m_EntOverlay[9].setTint(WHITE); 
+			if (u_EntOnOverlay.getOwner() == 0) { m_EntOverlay[9].setClickable(true); }
+			else { m_EntOverlay[9].setClickable(false); }
 			m_EntOverlay[10].setTint(MAGENTA), m_EntOverlay[10].setClickable(false);
 			break;
 		}
 		switch (drawMenu(m_EntOverlay))
 		{
 		case 8:
-			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected()) { u_Current.setTarget(NOTHING); u_Current.setTargetStatus(false); } }
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected() && u_Current.getOwner() == 0) { u_Current.setTarget(NOTHING); u_Current.setTargetStatus(false); } }
 			break;
 		case 9:
-			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected()) { u_Current.setTarget(UNITS); u_Current.setTargetStatus(false); } }
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected() && u_Current.getOwner() == 0) { u_Current.setTarget(UNITS); u_Current.setTargetStatus(false); } }
 			break;
 		case 10:
-			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected()) { u_Current.setTarget(BUILDINGS); u_Current.setTargetStatus(false); } }
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getSelected() && u_Current.getOwner() == 0) { u_Current.setTarget(BUILDINGS); u_Current.setTargetStatus(false); } }
 			break;
 		}
 	}
 	else if (isBuildOnOverlay)
 	{
-		/*char outputarray[20];
-		_itoa_s(234,outputarray,20,10);
-		
-		std::string d = std::to_string(234);
-		d.c_str();
-
-		std::stringstream ss;
-		ss << 234;
-		ss.str().c_str();*/
-
 		int HP = b_EntOnOverlay.getHP();
 		int DMG = b_EntOnOverlay.getDMG();
 		int percent = 100 * (b_EntOnOverlay.getElapsedTrainTime() / b_EntOnOverlay.getTrainTime());
@@ -132,7 +140,7 @@ void drawGameOverlay()
 		m_EntOverlay[2].setName(hp);
 		if (b_EntOnOverlay == b_HumanTower || b_EntOnOverlay == b_InvaderTower) { m_EntOverlay[4].setName(dmg); }
 		else { m_EntOverlay[4].setName("NV"); }
-		if (b_EntOnOverlay == b_InvaderTC || b_EntOnOverlay == b_InvaderBarracks || b_EntOnOverlay == b_InvaderTower) { m_EntOverlay[6].setName("Invaders"); m_EntOverlay[6].setTint(RED); }
+		if (b_EntOnOverlay.getOwner() == 1) { m_EntOverlay[6].setName("Invaders"); m_EntOverlay[6].setTint(p_AI.getPlayerColor()); }
 		else { m_EntOverlay[6].setTint(playerColor); m_EntOverlay[6].setName(profileName); }
 		if (b_EntOnOverlay == b_HumanBarracks || b_EntOnOverlay == b_InvaderBarracks)
 		{
@@ -170,43 +178,70 @@ void drawGameOverlay()
 		case 8:
 			if (b_EntOnOverlay == b_HumanBarracks)
 			{
-				addToQueue(u_Human, b_EntOnOverlay);
-			}
-			else if (b_EntOnOverlay == b_InvaderBarracks)
-			{
-				addToQueue(u_Invader, b_EntOnOverlay);
+				for (int a = 0; a < buildSpawnIndex; a++)
+				{
+					if (b_Current == b_HumanBarracks && b_Current.getSelected())
+					{
+						addToQueue(u_Human, b_Current);
+					}
+				}
 			}
 			break;
 		default:
 			break;
 		}
+		if (b_EntOnOverlay == b_HumanBarracks && getKey('S'))
+		{
+			for (int a = 0; a < buildSpawnIndex; a++)
+			{
+				if (b_Current == b_HumanBarracks && b_Current.getSelected())
+				{
+					addToQueue(u_Human, b_Current);
+				}
+			}
+		}
+	}
+	else if (isResourceOnOverlay)
+	{
+		int HP = r_EntOnOverlay.getHP();
+		char hp[4] = { itc(getHundredsPlace(HP)), itc(getTensPlace(HP)), itc(HP % 10), '\0' };
+		m_EntOverlay[0].setName(r_EntOnOverlay.getName());
+		m_EntOverlay[1].setName("Amount Left:");
+		m_EntOverlay[4].setName(hp); 
+		m_EntOverlay[3].setName(" "); m_EntOverlay[2].setName(" ");
+		m_EntOverlay[5].setName('\0');
+		PosDim pd = r_EntOnOverlay.getPosDim();
+		switch (r_EntOnOverlay.getID())
+		{
+		case 1:
+			drawTexture(r_EntOnOverlay.getSprite(), xSpace(50), ySpace(11), pd.w, pd.h, 90, true, r_EntOnOverlay.getSpriteIndex());
+			break;
+		default:
+			drawTexture(r_EntOnOverlay.getSprite(), xSpace(50), ySpace(11), pd.w, pd.h, 0, true, r_EntOnOverlay.getSpriteIndex());
+		}
+		drawMenu(m_EntOverlay);
 	}
 	else
 	{
-		int HP = 0;
+		int COST = 0;
 		int MONEY = p_Player.getMoney();
 
-		if (MONEY > 999) { MONEY = 999; p_Player.addMoney(-(p_Player.getMoney() - MONEY)); }
-		if (m_PlyrOverlay[3].isButtonHighlighted()) { HP = b_HumanBarracks.getCost(); }
-		else if (m_PlyrOverlay[4].isButtonHighlighted()) { HP = b_HumanTower.getCost(); }
+		if (MONEY > 9999) { MONEY = 9999; }
+		if (m_PlyrOverlay[7].isButtonHighlighted()) { COST = b_HumanBarracks.getCost(); }
+		else if (m_PlyrOverlay[8].isButtonHighlighted()) { COST = b_HumanTower.getCost(); }
 
-		char money[4] = { itc(getHundredsPlace(MONEY)), itc(getTensPlace(MONEY)), itc(MONEY % 10), '\0' };
-		char hp[4] = { itc(getHundredsPlace(HP)), itc(getTensPlace(HP)), itc(HP % 10), '\0' };
+		char money[5] = { itc(getThousandsPlace(MONEY)), itc(getHundredsPlace(MONEY)), itc(getTensPlace(MONEY)), itc(MONEY % 10), '\0' };
+		char hp[4] = { itc(getHundredsPlace(COST)), itc(getTensPlace(COST)), itc(COST % 10), '\0' };
 		
-		m_PlyrOverlay[6].setName(hp);
+		m_PlyrOverlay[10].setName(hp);
 		m_PlyrOverlay[1].setName(money);
-
-		m_PlyrOverlay[0].setClickable(true);
 
 		switch (drawMenu(m_PlyrOverlay))
 		{
-		case 0:
-			p_Player.addMoney(200);
-			break;
-		case 3: 
+		case 7: 
 			if(p_Player.getMoney() >= b_HumanBarracks.getCost()) { overrideMouse = 0; }
 			break;
-		case 4:	
+		case 8:	
 			if (p_Player.getMoney() >= b_HumanTower.getCost()) { overrideMouse = 1; }
 			break;
 		default: break;

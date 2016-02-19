@@ -1,18 +1,12 @@
 #pragma once
 #include "../ui/ui.h"
+#include "../Game/game.h"
 #include <iostream>
 using namespace std;
 
-enum Target
+struct PosDim
 {
-	NOTHING = -1,
-	UNITS = 0,
-	BUILDINGS = 4,
-};
-
-struct PosDim 
-{ 
-	float x, y, h, w; 
+	float x, y, h, w;
 
 	bool operator==(PosDim &pd)
 	{
@@ -34,21 +28,31 @@ struct PosDim
 	}
 };
 
+enum Target
+{
+	NOTHING = -1,
+	UNITS = 0,
+	BUILDINGS = 4,
+};
+
 class Entity
 {
 protected:
 	PosDim pd;
 	unsigned sprite;
-	int hp, dmg, spriteIndex = 0;
+	int hp, dmg, spriteIndex = 0, colorSprite;
 	int cost = 5;
+	int ownerIndex;
 	bool selected = false;
 	char *name;
 public:
 	PosDim getPosDim();
+	int getOwner();
 	unsigned getSprite();
 	int getHP();
 	int getDMG();
 	int getSpriteIndex();
+	int getColoredIndex();
 	int getCost();
 	bool getSelected();
 	char *getName();
@@ -59,8 +63,10 @@ public:
 	void setDMG(int DMG);
 	void setSelected(bool cr);
 	void setSpriteIndex(int si);
+	void setColoredIndex(int ci);
 	void setName(char *n);
 	void setCost(int c);
+	void setOwner(int playerIndex);
 };
 
 class Unit : public Entity
@@ -76,6 +82,9 @@ private:
 	bool hasTarget = false, isUnitTarget = true, targetInRange = false;
 	int unitID;
 public:
+	//Always false for humans. It is a flag used by the AI for grouping.
+	bool groupFlag = false;
+
 	Target getTarget();
 	float getSpeed();
 	float getTargetX();
@@ -87,6 +96,7 @@ public:
 	float getSavedY();
 	float getAttackSpeed();
 	float getLastAtk();
+	float getDistToTar();
 	int getID();
 	int getTargetedUnit();
 	int getTargetedBuild();
@@ -116,24 +126,56 @@ public:
 	//Default Constructor
 	Unit(void)
 	{
-		setHP(10); setDMG(1); setSpeed(10);
-		setSprite(ui_Text); setID(-1);
-		setName("DEFAULT");
-		stopMoving(); setUnitCollision(false);
+		pd = { 0 ,0, 9, 9 };
+		sprite = ui_Text;
+		spriteIndex = 0;
+		colorSprite = 0;
+		unitID = -1;
+		hp = 0;
+		dmg = 0;
+		speed = 0;
+		speedX = 0;
+		speedY = 0;
+		targetX = 0;
+		targetY = 0;
+		moving = 0;
+		hasSlope = false;
+		selected = false;
+		name = "Default";
+		atkRad = 0;
+		saveTX = 0;
+		saveTY = 0;
+		hasSavedCoords = false;
+		target = NOTHING;
+		targetInRange = false;
+		hasTarget = false;
+		atkSpeed = 0;
+		groupFlag = false;
+		ownerIndex = -1;
+		lastAtk = 0;
 	}
 	//Verbose constructor
-	Unit(int ID, char *name, unsigned sprt, int HP, int DMG, float spd, float ar, float as)
+	Unit(int ID, char *name, unsigned sprite, int spriteIndex, int colorIndex, int HP, int DMG, float spd, float range, float attackSpeed,int ownerIndex)
 	{
 		setHP(HP); setDMG(DMG); setSpeed(spd);
-		setSprite(sprt); setID(ID);
-		setName(name); setAtkRad(ar);
-		setAttackSpeed(as);
+		setSprite(sprite); setID(ID);
+		setSpriteIndex(spriteIndex); setColoredIndex(colorIndex);
+		setName(name); setAtkRad(range);
+		setAttackSpeed(attackSpeed);
+		setOwner(ownerIndex);
+		stopMoving();
+		setLastAttack(0);
+		target = NOTHING;
+		targetInRange = false;
+		hasTarget = false;
 	}
 
 	Unit &operator=(Unit &u)
 	{
 		pd				= u.getPosDim();
 		sprite			= u.getSprite(); 
+		spriteIndex		= u.getSpriteIndex();
+		colorSprite		= u.getColoredIndex();
 		unitID			= u.getID();
 		hp				= u.getHP(); 
 		dmg				= u.getDMG(); 
@@ -152,6 +194,9 @@ public:
 		hasSavedCoords	= u.doesUnitHaveSavedCoords();
 		target			= u.getTarget();
 		atkSpeed		= u.getAttackSpeed();
+		groupFlag       = u.groupFlag;
+		ownerIndex		= u.getOwner();
+		lastAtk			= u.getLastAtk();
 		return *this;
 	}
 	bool operator==(Unit &u)
@@ -165,13 +210,16 @@ public:
 		else { return false; }
 	}
 };
-const int unitIndex = 3;
+const int unitIndex = 6;
 extern int unitSpawnIndex;
 extern Unit u_AllBase[unitIndex];
 extern Unit *u_AllDynam;
 #define u_Empty		u_AllBase[0]
 #define u_Human		u_AllBase[1]
 #define u_Invader	u_AllBase[2]
+#define u_Hotdog	u_AllBase[3]
+#define u_HumanCollector u_AllBase[4]
+#define u_InvaderCollector u_AllBase[5]
 #define u_Current	u_AllDynam[a]
 #define u_Targeted	u_AllDynam[u.getTargetedUnit()]
 
@@ -210,15 +258,16 @@ public:
 		setSelected(false);
 		setName("DEFAULT");
 	}
-	Building(int ID, char *name, unsigned sprite, int spriteIndex, int HP, int DMG, float atkRad, float atkSpd, int cost)
+	Building(int ID, char *name, unsigned sprite, int spriteIndex, int coloredIndex, int HP, int DMG, float atkRad, float atkSpd, int cost, int ownerIndex)
 	{
-		setSprite(sprite); setID(ID);
-		setHP(HP); setDMG(DMG);
+		setSprite(sprite); 
+		setID(ID); setHP(HP); setDMG(DMG);
 		setAtkRad(atkRad);
-		setSpriteIndex(spriteIndex);
+		setSpriteIndex(spriteIndex); setColoredIndex(coloredIndex);
 		setName(name);
 		setAtkSpeed(atkSpd);
 		setCost(cost);
+		setOwner(ownerIndex);
 	}
 
 	Building &operator=(Building &b)
@@ -232,12 +281,16 @@ public:
 		maxQueue	= b.getMaxQueue();
 		atkRad		= b.getAtkRad();
 		spriteIndex = b.getSpriteIndex();
+		colorSprite = b.getColoredIndex();
 		name		= b.getName();
-		maxQueue	= b.getMaxQueue();
 		atkSpeed	= b.getAtkSpeed();
 		cost		= b.getCost();
 		gridPos[0]	= b.gridPos[0];
 		gridPos[1]	= b.gridPos[1];
+		ownerIndex	= b.getOwner();
+		lstAtk		= b.getLastAtk();
+		currentTrainTime = b.getElapsedTrainTime();
+		for (int a = 0; a < 10; a++) { queue[a] = b.queue[a]; }
 		return *this;
 	}
 	bool operator==(Building &b)
@@ -246,7 +299,7 @@ public:
 		else { return false; }
 	}
 };
-const int buildingIndex = 7;
+const int buildingIndex = 8;
 extern int buildSpawnIndex;
 extern Building b_AllBase[buildingIndex];
 extern Building *b_AllDynam;
@@ -257,6 +310,7 @@ extern Building *b_AllDynam;
 #define b_InvaderTC			b_AllBase[4]
 #define b_InvaderTower		b_AllBase[5]
 #define b_InvaderBarracks	b_AllBase[6]
+#define b_Farm				b_AllBase[7]
 #define b_Current			b_AllDynam[a]
 #define b_Targeted			b_AllDynam[u.getTargetedBuild()]
 
@@ -265,7 +319,7 @@ class Bullet : public Entity
 private:
 	float speed, speedX, speedY;
 	float targetX, targetY;
-	int bulletID, dmg;
+	int bulletID;
 	bool hasSlope = false;
 public:
 	float getSpeed();
@@ -290,8 +344,11 @@ public:
 		setID(-1);
 	}
 	//Verbose Constructor
-	Bullet(int ID, float speed, float dmg)
+	Bullet(int ID, int owner, PosDim location, float targetX, float targetY, float speed, float dmg)
 	{
+		setPosDim({ location.x, location.y, 1, 1 });
+		setTargetCoords(targetX, targetY);
+		setOwner(owner);
 		setSpeed(speed);
 		setDMG(dmg);
 		setID(ID);
@@ -307,6 +364,7 @@ public:
 		speedY = blt.getSpeed();
 		targetX = blt.getTargetX();
 		targetY = blt.getTargetY();
+		ownerIndex = blt.getOwner();
 		hasSlope = false;
 		return *this;
 	}
@@ -317,15 +375,75 @@ public:
 	}
 };
 extern int bulletSpawnIndex;
-const int bulletIndex = 5;
+const int bulletIndex = 1;
 extern Bullet blt_AllBase[bulletIndex];
 extern Bullet *blt_AllDynam;
 #define blt_Empty blt_AllBase[0]
-#define blt_Human blt_AllBase[1]
-#define blt_Invader blt_AllBase[2]
-#define blt_HumanTower blt_AllBase[3]
-#define blt_InvaderTower blt_AllBase[4]
 #define blt_Current blt_AllDynam[a]
+
+class Resource : public Entity
+{
+private:
+	int resourceID;
+	float resistance;
+public:
+	int getID();
+	float getResistance();
+
+	void setID(int id);
+	void setResistance(float r);
+
+	Resource(void)
+	{
+		sprite = ui_Text;
+		hp = 0;
+		dmg = 0;
+		spriteIndex = 0;
+		colorSprite = 0;
+		selected = false;
+		name = "Defualt";
+		setID(-1);
+		resistance = 0.0f;
+	}
+	Resource(int ID, char *name, unsigned sprite, int spiteIndex, int coloredIndex, int resourceCount, float collectResistance)
+	{
+		setID(ID); setName(name);
+		setSprite(sprite); setSpriteIndex(spiteIndex); setColoredIndex(coloredIndex);
+		setHP(resourceCount); setResistance(collectResistance);
+		selected = false;
+	}
+
+	Resource &operator=(Resource &r)
+	{
+		pd				= r.getPosDim();
+		hp				= r.getHP();
+		resourceID		= r.getID();
+		resistance		= r.getResistance();
+		sprite			= r.getSprite();
+		spriteIndex		= r.getSpriteIndex();
+		colorSprite		= r.getColoredIndex();
+		name			= r.getName();
+		selected		= r.getSelected();
+		return *this;
+	}
+
+	bool operator==(Resource &r)
+	{
+		if (resourceID == r.getID()) { return true; }
+		return false;
+	}
+};
+const int resourceIndex = 3;
+extern int resourceSpawnIndex;
+extern Resource r_AllBase[resourceIndex];
+extern Resource *r_AllDynam;
+#define r_Empty r_AllBase[0]
+#define r_Steel r_AllBase[1]
+#define r_Food r_AllBase[2]
+#define r_Current r_AllDynam[a]
+
+
+extern float dist(PosDim start, PosDim end);
 
 //In ent.cpp
 
@@ -336,7 +454,6 @@ extern void selectEnts(float selbox[4]);
 
 extern void spawnUnit(Unit u, float x = getMouseX(), float y = getMouseY(), float tx = 0, float ty = 0);
 extern void updateEnts();
-extern bool selectUnits( float selbox[4]);
 extern void moveSelectedUnits();
 extern void moveUnit(Unit &u);
 extern void findTarget(Unit &u);
@@ -345,8 +462,6 @@ extern void shootTarget(Unit &u);
 //In entBuild.cpp
 
 extern void spawnBuild(Building b, float x = getMouseX(), float y = getMouseY());
-extern void selectBuilds(float selbox[4]);
-extern void killBuild();
 extern void addToQueue(Unit u, Building &b);
 extern void updateQueue(Building &b);
 extern void checkForTargets(Building &b);
@@ -358,6 +473,12 @@ extern void spawnBullet(Building b, float tx, float ty);
 extern void moveBullet(Bullet &blt);
 extern void bulletCollision();
 
+//In entResource.cpp
+
+extern void spawnResource(Resource r, float x = getMouseX(), float y = getMouseY());
+
 /* Debug Functions */
 
 extern void killUnits(); //In entUnit.cpp
+extern void killBuild(); //In entBuild.cpp
+extern void killResource(); //In entResource.cpp
