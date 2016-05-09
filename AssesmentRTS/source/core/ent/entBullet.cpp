@@ -22,7 +22,7 @@ Bullet *blt_AllDynam;
 
 float time = 0;
 
-void spawnBullet(Unit u, float tx, float ty)
+void spawnBullet(Unit &u, float tx, float ty)
 {
 	PosDim unitPosDim = u.getPosDim();
 	Bullet blt;
@@ -51,7 +51,7 @@ void spawnBullet(Unit u, float tx, float ty)
 		delete[] temp;
 	}
 
-	blt_AllDynam[openIndex] = Bullet(0, u.getOwner(), unitPosDim, tx, ty, 75.0f, u.getDMG());
+	blt_AllDynam[openIndex] = Bullet(u.getUnitType(), u.getOwner(), unitPosDim, tx, ty, 75.0f, u.getDMG());
 }
 
 void spawnBullet(Building b, float tx, float ty)
@@ -121,19 +121,34 @@ void moveBullet(Bullet &blt)
 	}
 }
 
-void checkCollision(Bullet &u, int index, bool isBuild = false)
+void checkCollision(Bullet &u, int index, int entType)
 {
 	PosDim ua[2] = { u.getPosDim() };
 
-	if (isBuild) { ua[1] = b_AllDynam[index].getPosDim(); }
-	else { ua[1] = u_AllDynam[index].getPosDim(); }
+	switch (entType)
+	{
+	case 0: ua[1] = u_AllDynam[index].getPosDim(); break;
+	case 1: ua[1] = b_AllDynam[index].getPosDim(); break;
+	case 2: ua[1] = r_AllDynam[index].getPosDim(); break;
+	}
 
 	if (ua[0].x - (ua[0].w / 2) <= ua[1].x + (ua[1].w / 2) && ua[0].x + (ua[0].w / 2) >= ua[1].x - (ua[1].w / 2))
 	{
 		if (ua[0].y + (ua[0].h / 2) >= ua[1].y - (ua[1].h / 2) && ua[0].y - (ua[0].h / 2) <= ua[1].y + (ua[1].h / 2))
 		{
-			if (isBuild) { b_AllDynam[index].setHP(b_AllDynam[index].getHP() - u.getDMG()); }
-			else { u_AllDynam[index].setHP(u_AllDynam[index].getHP() - u.getDMG()); }
+			switch (entType)
+			{
+			case 0: u_AllDynam[index].setHP(u_AllDynam[index].getHP() - u.getDMG()); break;
+			case 1: b_AllDynam[index].setHP(b_AllDynam[index].getHP() - u.getDMG()); break;
+			case 2: r_AllDynam[index].setHP(r_AllDynam[index].getHP() - u.getDMG()); 
+				switch (r_AllDynam[index].getID())
+				{
+				case 0: p_AllBase[u.getOwner()].addSteel(u.getDMG()); break;
+				case 1: p_AllBase[u.getOwner()].addFodd (u.getDMG()); break;
+				}
+				break;
+			}
+			
 			u = blt_Empty;
 		}
 	}
@@ -144,15 +159,28 @@ void bulletCollision()
 	{
 		PosDim pd = blt_Current.getPosDim();
 
+		if (blt_Current.getID() == 1)
+		{
+			for (int b = 0; b < resourceSpawnIndex; b++)
+			{
+				if (r_AllDynam[b] == r_Empty) { continue; }
+				checkCollision(blt_Current, b, 2);
+			}
+			continue;
+		}
+
+		if (blt_Current == blt_Empty) { continue; }
 		for (int b = 0; b < unitSpawnIndex; b++)
 		{
-			if (u_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
-			else { checkCollision(blt_Current, b); }
+			if (u_AllDynam[b] == u_Empty || u_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
+			else { checkCollision(blt_Current, b, 0); }
 		}
+
+		if (blt_Current == blt_Empty) { continue; }
 		for (int b = 0; b < buildSpawnIndex; b++)
 		{
-			if (b_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
-			else { checkCollision(blt_Current, b, true); }
+			if (b_AllDynam[b] == b_Empty || b_AllDynam[b].getOwner() == blt_Current.getOwner()) { continue; }
+			else { checkCollision(blt_Current, b, 1); }
 		}
 	}
 }

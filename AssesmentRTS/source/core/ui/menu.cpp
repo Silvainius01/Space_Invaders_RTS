@@ -31,50 +31,50 @@ void Button::isHighlighted(bool ih) { highlighted = ih; }
 
 Menu m_CurrentMenu = MAIN;
 
-Button m_Dflt[3] = {Button("No menu\nimplemented", xSpace(50), ySpace(80), 5, 5, WHITE, CENTER, false),
+Button m_Dflt[3] = {Button("No menu\nimplemented", xSpace(50), ySpace(80), 5, 5, clr_WHITE, CENTER, false),
 					Button("MAIN MENU", xSpace(50), ySpace(45), 3, 3), Button() };
 
-Button m_Main[5] = {Button("SPACE\nINVADERS\n  RTS", xSpace(50), ySpace(80), 3, 3, WHITE,CENTER, false),
+Button m_Main[5] = {Button("SPACE\nINVADERS\n  RTS", xSpace(50), ySpace(80), 3, 3, clr_WHITE,CENTER, false),
 					Button("PLAY", xSpace(50), ySpace(50), 3, 3),
 					Button("OPTIONS", xSpace(50), ySpace(40), 3, 3),
 					Button("EXIT", xSpace(50), ySpace(30), 3, 3), Button() };
 
-Button m_Play[4] = {Button("PLAY GAME", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+Button m_Play[4] = {Button("PLAY GAME", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
 					Button("NEW", xSpace(50), ySpace(50), 3, 3),
 					Button("LOAD", xSpace(50), ySpace(40), 3, 3), Button() };
 
-Button m_Optn[7] = {Button("OPTIONS", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+Button m_Optn[7] = {Button("OPTIONS", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
 					Button("PROFILE", xSpace(50), ySpace(60), 3, 3),
 					Button("CONTROLS", xSpace(50), ySpace(50), 3, 3),
 					Button("SCREEN RESOLUTION", xSpace(50), ySpace(40), 3, 3),
 					Button("COLOR", xSpace(50), ySpace(30), 3, 3),
 					Button("BACK", xSpace(50), ySpace(20), 3, 3), Button() };
 
-Button m_Ctrl[5] = {Button("CONTROLS", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+Button m_Ctrl[5] = {Button("CONTROLS", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
 					Button("MOVEMENT", xSpace(50), ySpace(60), 3, 3),
 					Button("HOTKEYS", xSpace(50), ySpace(50), 3, 3),
 					Button("BACK", xSpace(50), ySpace(40), 3, 3), Button() };
 
-Button m_Scrn[5] = {Button("SCREEN RESOLUTION", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+Button m_Scrn[5] = {Button("SCREEN RESOLUTION", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
 					Button("WIDTH", xSpace(50), ySpace(60), 3, 3),
 					Button("HEIGHT", xSpace(50), ySpace(50), 3, 3),
 					Button("BACK", xSpace(50), ySpace(40), 3, 3), Button() };
 
-Button m_Clr[11] = {Button("COLOR", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
-					Button("BLUE", xSpace(25), ySpace(60), 3, 3, BLUE),
-					Button("RED", xSpace(25), ySpace(50), 3, 3, RED),
-					Button("GREEN", xSpace(25), ySpace(40), 3, 3, GREEN),
-					Button("CYAN", xSpace(25), ySpace(30), 3, 3, CYAN),
-					Button("MAGENTA", xSpace(75), ySpace(60), 3, 3, MAGENTA),
-					Button("YELLOW", xSpace(75), ySpace(50), 3, 3, YELLOW),
-					Button("BLACK", xSpace(75), ySpace(40), 3, 3, BLACK),
+Button m_Clr[11] = {Button("COLOR", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
+					Button("BLUE", xSpace(25), ySpace(60), 3, 3, clr_BLUE),
+					Button("RED", xSpace(25), ySpace(50), 3, 3, clr_RED),
+					Button("BLACK", xSpace(25), ySpace(40), 3, 3, clr_GREEN),
+					Button("CYAN", xSpace(25), ySpace(30), 3, 3, clr_CYAN),
+					Button("MAGENTA", xSpace(75), ySpace(60), 3, 3, clr_MAGENTA),
+					Button("YELLOW", xSpace(75), ySpace(50), 3, 3, clr_YELLOW),
+					Button("GREEN", xSpace(75), ySpace(40), 3, 3, clr_BLACK),
 					Button("WHITE", xSpace(75), ySpace(30), 3, 3),
 					Button("BACK", xSpace(50), ySpace(10), 3, 3), Button() };
 
-Button m_End[3] = { Button("You Lost", xSpace(50), ySpace(80), 3, 3, WHITE, CENTER, false),
+Button m_End[3] = { Button("You Lost", xSpace(50), ySpace(80), 3, 3, clr_WHITE, CENTER, false),
 					Button("Main Menu", xSpace(50), ySpace(60), 3, 3), Button() };
 
-Button m_ChatBox[2] = { Button("\0", xSpace(5), ySpace(70), 3, 3, WHITE, RIGHT, false), Button() };
+Button m_ChatBox[2] = { Button("\0", xSpace(5), ySpace(70), 3, 3, clr_WHITE, RIGHT, false), Button() };
 
 int drawMenu(Button *b, int indexLimiter, bool constHighlight)
 {
@@ -104,7 +104,7 @@ int drawMenu(Button *b, int indexLimiter, bool constHighlight)
 			break;
 		}
 
-		if (constHighlight) { drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, MAGENTA); }
+		if (constHighlight) { drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, clr_MAGENTA); }
 
 		if (mY <= b[a].getYPos() && mY >= b[a].getYPos() - height)
 		{
@@ -112,7 +112,7 @@ int drawMenu(Button *b, int indexLimiter, bool constHighlight)
 			{
 				if (b[a].isClickable())
 				{
-					drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, MAGENTA);
+					drawBox(b[a].getXPos() - adjustment, b[a].getYPos() + b[a].getHeight(), -height, width + adjustment, clr_MAGENTA);
 					b[a].isHighlighted(true);
 					if (checkMouse(false) == MOUSE_BUTTON_LEFT)
 					{
@@ -140,8 +140,8 @@ void drawSelBox(Button b, unsigned forceTint)
 	unsigned tint;
 	int adjustment;
 
-	if (forceTint != NONE) { tint = forceTint; }
-	else { tint = MAGENTA; }
+	if (forceTint != clr_NONE) { tint = forceTint; }
+	else { tint = clr_MAGENTA; }
 
 	switch (b.getAllign())
 	{
@@ -162,13 +162,13 @@ int getSelectedColor()
 {
 	switch (playerColor)
 	{
-	case WHITE: return 8; break;
-	case BLACK: return 7; break;
-	case CYAN: return 4; break;
-	case MAGENTA: return 5; break;
-	case YELLOW: return 6; break;
-	case RED: return 2; break;
-	case GREEN: return 3; break;
-	case BLUE: return 1; break;
+	case clr_WHITE: return 8; break;
+	case clr_BLACK: return 7; break;
+	case clr_CYAN: return 4; break;
+	case clr_MAGENTA: return 5; break;
+	case clr_YELLOW: return 6; break;
+	case clr_RED: return 2; break;
+	case clr_GREEN: return 3; break;
+	case clr_BLUE: return 1; break;
 	}
 }

@@ -25,7 +25,8 @@ unsigned ui_Background;
 unsigned ui_Hotdog;
 unsigned ui_Resource;
 unsigned ui_Collector;
-unsigned mouseTint = CYAN;
+unsigned ui_Farm;
+unsigned mouseTint = clr_CYAN;
 
 float xSpace(float num, float den) { return (SCREEN[0] / den) * num; }
 float ySpace(float num, float den) { return (SCREEN[1] / den) * num; }
@@ -42,6 +43,7 @@ void initUI()
 	ui_Background = loadTextureMap("./source/assets/background.png");
 	ui_Hotdog = loadTextureMap("./source/assets/hotdog.png", 2);
 	ui_Resource = loadTextureMap("./source/assets/resources.png", 1, 2);
+	ui_Collector = loadTextureMap("./source/assets/collector.png", 2);
 }
 
 void initBuildGrid()
@@ -359,24 +361,24 @@ void drawBuildGrid()
 		{
 			if (y + 1 < 8)
 			{
-				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10), ySpace(10), xSpace(10), clr_GREEN);
 				bat[y + 1][x] = 2;
 			}
 			if (y - 1 > -1)
 			{
-				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				drawBox(xSpace(buildGrid[y][x] * 10), ySpace((buildGrid[y - 1][x] + y + 1 - x) * 10), ySpace(10), xSpace(10), clr_GREEN);
 
 
 				bat[y - 1][x] = 2;
 			}
 			if (x + 1 < 10)
 			{
-				drawBox(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				drawBox(xSpace(buildGrid[y][x + 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), clr_GREEN);
 				bat[y][x + 1] = 2;
 			}
 			if (x - 1 > -1)
 			{
-				drawBox(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), GREEN);
+				drawBox(xSpace(buildGrid[y][x - 1] * 10), ySpace((buildGrid[y][x] + y + 2 - x) * 10), ySpace(10), xSpace(10), clr_GREEN);
 				bat[y][x - 1] = 2;
 			}
 		}
@@ -420,7 +422,7 @@ void drawBuildGrid()
 	{
 		for (int b = 0; b < gridX; b++)
 		{
-			if (bat[a][b] == 0) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), GREEN); }
+			if (bat[a][b] == 0) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), clr_GREEN); }
 		}
 	}
 
@@ -428,7 +430,7 @@ void drawBuildGrid()
 	{
 		for (int b = 0; b < gridX; b++)
 		{
-			if (bat[a][b] == 3) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), BLUE); }
+			if (bat[a][b] == 3) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), clr_BLUE); }
 		}
 	}
 
@@ -436,7 +438,7 @@ void drawBuildGrid()
 	{
 		for (int b = 0; b < gridX; b++)
 		{
-			if (bat[a][b] == 1) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), RED); }
+			if (bat[a][b] == 1) { drawBox(xSpace(buildGrid[a][b] * 10), ySpace((buildGrid[a][b] + a + 2 - b) * 10), ySpace(10), xSpace(10), clr_RED); }
 		}
 	}
 
@@ -462,16 +464,16 @@ void drawBuildGrid()
 	switch (bat[mgy][mgx])
 	{
 	case -1: case 1:
-		mouseTint = RED; break;
+		mouseTint = clr_RED; break;
 	case 0:  case 2:
-		if (overrideMouse == 1) { mouseTint = GREEN; }
-		else if (overrideMouse == 0) { mouseTint = RED; }
+		if (overrideMouse == 1) { mouseTint = clr_GREEN; }
+		else if (overrideMouse == 0) { mouseTint = clr_RED; }
 		break;
 	case 3:
-		if (overrideMouse == 1) { mouseTint = RED; }
-		else if (overrideMouse == 0) { mouseTint = GREEN; }
+		if (overrideMouse == 1) { mouseTint = clr_RED; }
+		else if (overrideMouse == 0) { mouseTint = clr_GREEN; }
 		break;
 	default:
-		mouseTint = RED;
+		mouseTint = clr_RED;
 	}
 }

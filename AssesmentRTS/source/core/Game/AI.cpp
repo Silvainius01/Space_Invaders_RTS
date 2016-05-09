@@ -7,7 +7,9 @@ enum UnitTask
 {
 	IDLE = 0,
 	FIGHT_UNITS = 1,
-	FIGHT_BUILDS = 2
+	FIGHT_BUILDS = 2,
+	COLLECT_STEEL = 3,
+	COLLECT_FOOD = 4
 };
 
 bool canBuildTower = false;
@@ -15,6 +17,7 @@ bool canBuildBarracks = false;
 bool firstRun = true;
 bool targetingBuilds = false;
 
+int state = 0;
 int tempCount = 0;
 int money;
 int playerUnits;
@@ -30,6 +33,14 @@ int towers;
 int ai_bg[gridY][gridX];
 int tmr_Count = 0;
 int unitCountSave = 0;
+int collectors;
+int steelNodes;
+int foodNodes;
+int food;
+int steel;
+int collectorBarracks = 0;
+int buildUpgrades[4] = { 0, 0, 0, 0 };
+int unitUpgrades[4] = { 0, 0, 0, 0 };
 
 float ai_TimerStart = 0.0f;
 float tmr_Update = ai_TimerStart;
@@ -40,7 +51,7 @@ int ai_CU()
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader) { count++; }
+		if (u_Current.getOwner() == 1 && u_Current != u_InvaderCollector) { count++; }
 	}
 
 	return count;
@@ -53,23 +64,24 @@ int ai_CUDT(UnitTask ut)
 	switch (ut)
 	{
 	case IDLE:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == NOTHING) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1 && u_Current.getTarget() == NOTHING) { count++; } } break;
 	case FIGHT_UNITS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == UNITS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1 && u_Current.getTarget() == UNITS) { count++; } } break;
 	case FIGHT_BUILDS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Invader && u_Current.getTarget() == BUILDINGS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1 && u_Current.getTarget() == BUILDINGS) { count++; } } break;
 	}
 
 	return count;
 }
 
 //Count number of player units
+//Change for unit types
 int ai_CPU()
 {
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			count++;
 		}
@@ -84,7 +96,7 @@ int ai_CPUAU()
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human && u_Current.getTarget() == UNITS && u_Current.isTargetInRange())
+		if (u_Current.getOwner() == 0 && u_Current.getTarget() == UNITS && u_Current.isTargetInRange())
 		{
 			count++;
 		}
@@ -98,7 +110,7 @@ int ai_CPUNB()
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human && u_Current.getTarget() == BUILDINGS && u_Current.isTargetInRange())
+		if (u_Current.getOwner() == 0 && u_Current.getTarget() == BUILDINGS && u_Current.isTargetInRange())
 		{
 			count++;
 		}
@@ -108,13 +120,14 @@ int ai_CPUNB()
 }
 
 //Counts the number of player units that are or aren't in an area
+//Change for unit types
 int ai_CPUIA(float x, float y, float h, float w, bool countOut = false)
 {
 	int count = 0;
 	PosDim pd;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			pd = u_Current.getPosDim();
 
@@ -142,7 +155,7 @@ int ai_CPUIADT(float x, float y, float h, float w, Target tar)
 	PosDim pd;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human && u_Current.getTarget() == tar)
+		if (u_Current.getOwner() == 0 && u_Current.getTarget() == tar)
 		{
 			pd = u_Current.getPosDim();
 
@@ -163,7 +176,7 @@ int ai_CMUIA(float x, float y, float h, float w, bool countOut = false)
 	PosDim pd;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			pd = u_Current.getPosDim();
 
@@ -205,7 +218,7 @@ int ai_CBG(Target tar)
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
 		//Finds the biggest group of units attacking their target (tar)
-		if (u_Current == u_Invader && u_Current.getTarget() == tar)
+		if (u_Current.getOwner() == 1 && u_Current.getTarget() == tar)
 		{
 			int group = ai_CPUIADT(u_Current.getPosDim().x, u_Current.getPosDim().y, u_Current.getAtkRad(), u_Current.getAtkRad(), tar);
 			if (group > biggestGroup) { biggestGroup = group; }
@@ -215,12 +228,68 @@ int ai_CBG(Target tar)
 	return biggestGroup;
 }
 
+//Counts all collectors, including ones in barrack queues
+int ai_CC()
+{
+	int count = 0;
+
+	for (int a = 0; a < unitSpawnIndex; a++)
+		if (u_Current == u_InvaderCollector && u_Current.getOwner() == 1)
+			count++;
+
+	for (int a = 0; a < buildSpawnIndex; a++)
+		if (b_Current == b_InvaderBarracks)
+			for (int b = 0; b < 10; b++)
+				if (b_Current.queue[b] == u_InvaderCollector.getID())
+					count++;
+	return count;
+}
+
+//Counts all collecters doing a certain task
+int ai_CCDT(Target tar)
+{
+	int count = 0;
+	for (int a = 0; a < unitSpawnIndex; a++)
+	{
+		if (u_Current == u_InvaderCollector && u_Current.getOwner() == 1)
+		{
+			if (u_Current.getTarget() == tar)
+				count++;
+		}
+	}
+	return count;
+}
+
+//Counts all steel caches
+int ai_CSC()
+{
+	int count = 0; 
+	for (int a = 0; a < resourceSpawnIndex; a++)
+	{
+		if (r_Current == r_Steel)
+			count++;
+	}
+	return count;
+}
+
+//Counts all food caches
+int ai_CFC()
+{
+	int count = 0;
+	for (int a = 0; a < resourceSpawnIndex; a++)
+	{
+		if (r_Current == r_Food)
+			count++;
+	}
+	return count;
+}
+
 //Are there player buildings in a given area?
 bool ai_CPBIA(float x, float y, float h, float w)
 {
 	for (int a = 0; a < buildSpawnIndex; a++)
 	{
-		if (b_Current == b_HumanBarracks || b_Current == b_HumanTC || b_Current == b_HumanTower)
+		if (b_Current.getOwner() == 0)
 		{
 			PosDim pd = b_Current.getPosDim();
 
@@ -246,7 +315,7 @@ PosDim ai_FBEG(Target tar)
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
 		//Finds the biggest group of units attacking their target (tar)
-		if (u_Current == u_Human && u_Current.getTarget() == tar && u_Current.isTargetInRange())
+		if (u_Current.getOwner() == 0 && u_Current.getTarget() == tar && u_Current.isTargetInRange())
 		{
 			int group = ai_CPUIADT(u_Current.getPosDim().x, u_Current.getPosDim().y, u_Current.getAtkRad(), u_Current.getAtkRad(), tar);
 			if (group > biggestGroup) { biggestGroup = group; location = u_Current.getPosDim(); }
@@ -264,7 +333,7 @@ PosDim ai_FBAIG(Target tar)
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
 		//Finds the biggest group of units attacking their target (tar)
-		if (u_Current == u_Invader && u_Current.getTarget() == tar)
+		if (u_Current.getOwner() == 1 && u_Current.getTarget() == tar)
 		{
 			int group = ai_CPUIADT(u_Current.getPosDim().x, u_Current.getPosDim().y, u_Current.getAtkRad(), u_Current.getAtkRad(), tar);
 			if (group > biggestGroup) { biggestGroup = group; location = u_Current.getPosDim(); }
@@ -274,21 +343,32 @@ PosDim ai_FBAIG(Target tar)
 }
 
 //sets number of units to a task, regardless of current task.
+//TODO: With unit types coming soon, Come in here and set this to check types.
 void ai_SUT(const int numUnits, UnitTask task)
 {
 	for (int a = 0, b = numUnits; a < unitSpawnIndex; a++)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			switch (task)
 			{
 			case FIGHT_UNITS:
-				u_Current.setTarget(UNITS);
+				if(u_Current.getUnitType() == 0)
+					u_Current.setTarget(UNITS);
 				break;
 			case FIGHT_BUILDS:
-				u_Current.setTarget(BUILDINGS);
+				if (u_Current.getUnitType() == 0)
+					u_Current.setTarget(BUILDINGS);
+				break;
+			case COLLECT_STEEL:
+				if (u_Current.getUnitType() == 1)
+					u_Current.setTarget(STEEL);
+				break;
+			case COLLECT_FOOD:
+				if (u_Current.getUnitType() == 1)
+					u_Current.setTarget(FOOD);
 				break;
 			default:
 				u_Current.setTarget(NOTHING);
@@ -300,13 +380,14 @@ void ai_SUT(const int numUnits, UnitTask task)
 }
 
 //Removes a task from number of units if they have one
+//Change for unit types
 void ai_RUFM(const int numUnits, UnitTask task)
 {
 	for (int a = 0, b = numUnits; a < unitSpawnIndex; a++)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			if (u_Current.getTarget() == NOTHING) { continue; }
 			else { u_Current.setTarget(NOTHING); b--; }
@@ -315,6 +396,7 @@ void ai_RUFM(const int numUnits, UnitTask task)
 }
 
 //Takes number of units doing one task, and sets them to another
+//Change for unit types
 void ai_SUTFUT(const int numUnits, UnitTask doThis, UnitTask notThis)
 {
 	Target task;
@@ -338,7 +420,7 @@ void ai_SUTFUT(const int numUnits, UnitTask doThis, UnitTask notThis)
 		
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			if (u_Current.getTarget() == task)
 			{
@@ -351,12 +433,13 @@ void ai_SUTFUT(const int numUnits, UnitTask doThis, UnitTask notThis)
 
 //Sets all or a number of its units wihtin the passed area to the passed target,
 //Note: this forces a retarget on all affected units.
+//Change for unit types
 void ai_SUTIA(float x, float y, float h, float w, Target tar, int cap = units + 1)
 {
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			PosDim pd = u_Current.getPosDim();
 			if (pd.x >= x && pd.x <= x + w)
@@ -381,7 +464,7 @@ void ai_MU(const int numUnits, float tx, float ty)
 	for (int a = 0, b = numUnits; a < unitSpawnIndex; a++)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
-		if (u_Current == u_Invader && u_Current.getTarget() == NOTHING)
+		if (u_Current.getOwner() == 1 && u_Current.getTarget() == NOTHING)
 		{
 			u_Current.setTargetCoords(tx, ty);
 			b--;
@@ -487,7 +570,7 @@ void ai_CBS()
 }
 
 //Start training a certain number of units, will change based on availble room.
-void ai_QU(int numUnits)
+void ai_QU(int numUnits, Unit u = u_Invader)
 {
 	int targetBarrack;
 	int comp = 11;
@@ -516,7 +599,7 @@ void ai_QU(int numUnits)
 
 	for (int a = comp; a < comp + numUnits; a++)
 	{
-		b_AllDynam[targetBarrack].queue[a] = u_Invader.getID();
+		addToQueue(u, b_AllDynam[targetBarrack]);
 	}
 }
 
@@ -649,6 +732,7 @@ void ai_PB()
 	}
 }
 
+//Calculates what to do with fighter units
 void ai_UU()
 {
 
@@ -662,7 +746,7 @@ void ai_UU()
 	for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current == b_InvaderTC) { ib = b_Current.getPosDim(); a = buildSpawnIndex; } }
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			closestUnit = u_Current.getPosDim();
 			if (dist(ib, closestUnit) < sqrt(expo<float>(xSpace(25), 2) + expo<float>(ySpace(25), 2)))
@@ -698,11 +782,11 @@ void ai_UU()
 		for (int a = 0; a < unitSpawnIndex; a++)
 		{
 			int count = 0;
-			if (u_Current == u_Invader && !u_Current.groupFlag)
+			if (u_Current.getOwner() == 1 && !u_Current.groupFlag) //Change for unit types
 			{
 				for (int b = 0; b < buildSpawnIndex; b++)
 				{
-					if (b_AllDynam[b] == b_HumanBarracks || b_AllDynam[b] == b_HumanTC || b_AllDynam[b] == b_HumanTower)
+					if (b_AllDynam[b].getOwner() == 0)
 					{
 						if (dist(u_Current.getPosDim(), b_AllDynam[b].getPosDim()) <= u_Current.getAtkRad() * 2)
 						{
@@ -718,7 +802,7 @@ void ai_UU()
 				//If they weren't grouped, it adds them to its group.
 				for (int b = 0; b < unitSpawnIndex; b++)
 				{
-					if (u_AllDynam[b] == u_Invader && !u_AllDynam[b].groupFlag)
+					if (u_AllDynam[b].getOwner() == 0 && !u_AllDynam[b].groupFlag) //Change for unit types
 					{
 						if (dist(u_Current.getPosDim(), u_AllDynam[b].getPosDim()) <= u_Current.getAtkRad())
 						{
@@ -760,14 +844,92 @@ void ai_UU()
 
 }
 
+//calculates what to do with collectors
+void ai_UCU()
+{
+	if (b_AllDynam[collectorBarracks] != b_InvaderBarracks)
+		for (int a = 0; a < buildSpawnIndex; a++)
+			if (b_Current == b_InvaderBarracks)
+				collectorBarracks = a, a = buildSpawnIndex;
+
+	if (collectors < 10)
+		for (int a = 0; a < 10 - collectors; a++)
+			addToQueue(u_InvaderCollector, b_AllDynam[collectorBarracks]);
+
+	
+	ai_SUT(10, COLLECT_STEEL);
+	ai_SUT(5, COLLECT_FOOD);
+}
+
+//Determines upgrades for units
+void ai_UGU()
+{
+	//TODO: 
+	//	If I ever come back and add AI personalities, 
+	//	I'll have to come in and make this algorithm actually think
+
+	// { damage, range, RoF, HP } \\
+	   { 4, 6, 2, 4 }
+
+
+	switch (std::rand() % 4)
+	{
+	case 0:
+		if (unitUpgrades[0] < 4 && p_AI.getSteel() >= 250 && p_AI.getFood() >= 50)
+		{
+			p_AI.addSteel(-250);
+			p_AI.addFodd(-50);
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setDMG(u_Current.getDMG() + 2); } }
+			for (int a = 0; a < unitIndex;		a++) { if (u_Current.getOwner() == 1) { u_Current.setDMG(u_Current.getDMG() + 2); } }
+		}
+		break;
+	case 1:
+		if (unitUpgrades[1] < 6 && p_AI.getSteel() >= 150 && p_AI.getFood() >= 150)
+		{
+			p_AI.addSteel(-150);
+			p_AI.addFodd(-150);
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAtkRad(u_Current.getAtkRad() + 5.0f); } }
+			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAtkRad(u_AllBase[a].getAtkRad() + 5.0f); } }
+		}
+		break;
+	case 2:
+		if (unitUpgrades[2] < 2 && p_AI.getSteel() >= 100 && p_AI.getFood() >= 200)
+		{
+			p_AI.addSteel(-100);
+			p_AI.addFodd(-200);
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAttackSpeed(u_Current.getAttackSpeed() + 5.0f); } }
+			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAttackSpeed(u_AllBase[a].getAttackSpeed() + 5.0f); } }
+		}
+		break;
+	case 3:
+		if (unitUpgrades[3] < 4 && p_AI.getSteel() >= 50 && p_AI.getFood() >= 250)
+		{
+			p_AI.addSteel(-50);
+			p_AI.addFodd(-250);
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setHP(u_Current.getHP() + 5); } }
+			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setHP(u_AllBase[a].getHP() + 5); } }
+		}
+		break;
+	}
+
+
+}
+
+//determines upgrades for buildings
+void ai_UGB()
+{
+
+}
+
 void ai_Run(float updateTime)
 {
+
+
 	if (tmr_Update >= updateTime)
 	{
 		money = p_AI.getMoney();
-		cout << "AI Money: " << money << endl;
-
-		tmr_Update = 0.0f;
+		food = p_AI.getFood();
+		steel = p_AI.getSteel();
 
 		playerUnits = ai_CPU();
 		playerUnitsAttackingBuilds = ai_CPUNB();
@@ -776,13 +938,21 @@ void ai_Run(float updateTime)
 		idleUnits = ai_CUDT(IDLE);
 		unitAttackers = ai_CUDT(FIGHT_UNITS);
 		barracks = ai_CB();
+		collectors = ai_CC();
+		foodNodes = ai_CFC();
+		steelNodes = ai_CSC();
+
+		if (!firstRun)
+			ai_UCU(), ai_UGU();
 
 		ai_UU();
 		ai_CBS();
 		if (canBuildBarracks) { ai_PB(); }
 		else if (canBuildTower) { ai_PT(); }
 
+		cout << "Money: " << money << "\nFood: " << food << "\nSteel: " << steel << endl;
 		for (int a = 0; a < unitSpawnIndex; a++) { u_Current.groupFlag = false; }
+		tmr_Update = 0.0f;
 	}
 	else { tmr_Update += getDeltaTime(); }
 }

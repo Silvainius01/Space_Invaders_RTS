@@ -22,6 +22,7 @@ bool chatShift = false;
 int chatPlace = 0;
 int chatKey;
 float x, y;
+float tempTimer = 0.0f;
 char chat[30];
 
 int checkEndConds()
@@ -48,7 +49,7 @@ void debugGameMode()
 
 	if (getKey(KEY_RSHIFT) && !shift) { shift = true; }
 
-	if (debug)
+	if (debug && !chatBoxOpen)
 	{
 		switch (key)
 		{
@@ -60,9 +61,24 @@ void debugGameMode()
 			if (shift) { spawnBuild(b_InvaderTC); }
 			else { spawnBuild(b_HumanTC); }
 			break;
+		case KEY_E:
+			tempTimer = 180.0f;
+			break;
 		case KEY_M:
 			if (shift) { p_AI.addMoney(2000); }
-			else { p_Player.addMoney(2000); }
+			else 
+			{ 
+				p_Player.addMoney(2000);
+				p_Player.addSteel(2000);
+				p_Player.addFodd(2000);
+			}
+			break;
+		case KEY_O:
+			if (shift) { spawnUnit(u_InvaderCollector, 1); }
+			else { spawnUnit(u_HumanCollector, 0); }
+			break;
+		case KEY_P:
+			if (isUnitOnOverlay) { u_EntOnOverlay.print(); }
 			break;
 		case KEY_R:
 			if (shift) { spawnResource(r_Steel); }
@@ -73,8 +89,8 @@ void debugGameMode()
 			else { spawnBuild(b_HumanTower); }
 			break;
 		case KEY_U:
-			if (shift) { spawnUnit(u_Invader); }
-			else { spawnUnit(u_Human); }
+			if (shift) { spawnUnit(u_Invader, 1); }
+			else { spawnUnit(u_Human, 0); }
 			break;
 		case KEY_RCTRL:
 			if (shift)
@@ -102,7 +118,7 @@ void debugGameMode()
 			}
 			break;
 		case KEY_BACKSPACE:
-			killUnits(); killBuild(); break;
+			killUnits(); killBuild(); killResource(); break;		
 		}
 	}
 	
@@ -120,41 +136,41 @@ void debugGameMode()
 		switch (overrideMouse)
 		{
 		case 0:
-			if (mouseTint == GREEN && !debug)
+			if (mouseTint == clr_GREEN && !debug)
 			{
 				spawnBuild(b_HumanBarracks);
 				p_Player.addMoney(-(b_HumanBarracks.getCost()));
 				overrideMouse = -1;
-				mouseTint = CYAN;
+				mouseTint = clr_CYAN;
 			}
 			else if(debug)
 			{
 				spawnBuild(b_HumanBarracks);
 				p_Player.addMoney(-(b_HumanBarracks.getCost()));
 				overrideMouse = -1;
-				mouseTint = CYAN;
+				mouseTint = clr_CYAN;
 			}
 			break;
 		case 1:
-			if (mouseTint == GREEN && !debug)
+			if (mouseTint == clr_GREEN && !debug)
 			{
 				spawnBuild(b_HumanTower);
 				p_Player.addMoney(-(b_HumanTower.getCost()));
 				overrideMouse = -1;
-				mouseTint = CYAN;
+				mouseTint = clr_CYAN;
 			}
 			else if (debug)
 			{
 				spawnBuild(b_HumanTower);
 				p_Player.addMoney(-(b_HumanTower.getCost()));
 				overrideMouse = -1;
-				mouseTint = CYAN;
+				mouseTint = clr_CYAN;
 			}
 			break;
 		default:
 			if (!clickedL) { x = getMouseX(); y = getMouseY(); clickedL = true; }
 			if (y <= ySpace(20)) { clickedL = false; }
-			drawBox(x, y, -(y - getMouseY()), -(x - getMouseX()), MAGENTA);
+			drawBox(x, y, -(y - getMouseY()), -(x - getMouseX()), clr_MAGENTA);
 			break;
 		}
 	}
@@ -171,11 +187,32 @@ void debugGameMode()
 
 	if (mouse == MOUSE_BUTTON_RIGHT)
 	{
-		moveSelectedUnits();
+		if (overrideMouse == -1)
+		{
+			moveSelectedUnits();
+		}
+		else
+		{
+			overrideMouse = -1;
+			mouseTint = clr_CYAN;
+		}
 	}
 
 	if (startDCT && tmr_DoubleClick < 0.25f) { tmr_DoubleClick += getDeltaTime(); }
 	else { tmr_DoubleClick = 0.0f; startDCT = false;  }
+
+	if (printGrid)
+	{
+		const int boxSize = 10;
+
+		for (float x = xSpace(0); x / xSpace(5) != 20; x += xSpace(boxSize))
+		{
+			for (float y = ySpace(20); y / ySpace(5) != 20; y += ySpace(boxSize))
+			{
+				drawBox(x, y, ySpace(boxSize), xSpace(boxSize), clr_RED);
+			}
+		}
+	}
 
 	drawGameOverlay();
 }
@@ -231,16 +268,16 @@ void debugMenuMode()
 	case OPT_COLOR:
 		switch (drawMenu(m_Clr))
 		{
-		case 1: playerColor = BLUE; break;
-		case 2: playerColor = RED; break;
-		case 3: playerColor = GREEN; break;
-		case 4: playerColor = CYAN; break;
-		case 5: playerColor = MAGENTA; break;
-		case 6: playerColor = YELLOW; break;
-		case 7: playerColor = BLACK; break;
-		case 8: playerColor = WHITE; break;
+		case 1: playerColor = clr_BLUE; break;
+		case 2: playerColor = clr_RED; break;
+		case 3: playerColor = clr_BLACK; break;
+		case 4: playerColor = clr_CYAN; break;
+		case 5: playerColor = clr_MAGENTA; break;
+		case 6: playerColor = clr_YELLOW; break;
+		case 7: playerColor = clr_GREEN; break;
+		case 8: playerColor = clr_WHITE; break;
 		case 9: m_CurrentMenu = OPTION; break;
-		default: drawSelBox(m_Clr[getSelectedColor()], BLACK); break;
+		default: drawSelBox(m_Clr[getSelectedColor()], clr_BLACK); break;
 		}
 		break;
 	/*case OPT_CTRL_MOVE:
@@ -270,7 +307,7 @@ void main()
 		chat[a] = '\0';
 	}
 
-	float tempTimer = 0.0f;
+	
 
 	while (stepContext())
 	{
@@ -281,6 +318,8 @@ void main()
 		{
 			if (first)
 			{
+				initEnts();
+				initBuildGrid();
 				initGame();
 				first = false;
 			}
@@ -290,8 +329,10 @@ void main()
 			case -1: 
 				debugGameMode(); 
 				updateEnts(); 
+				tempTimer += getDeltaTime();
 				if (ai) { ai_Run(); } 
 				if (aih) { aih_Run();  }
+				if (tempTimer >= 180.0f) { rRep(); tempTimer = 0.0f; }
 				break;
 			default:
 				if (drawMenu(m_End) != -1)
@@ -303,7 +344,7 @@ void main()
 						u_Current = u_Empty;
 					}
 					unitSpawnIndex = 0; 
-					spawnUnit(u_Empty);
+					spawnUnit(u_Empty, -1);
 					m_CurrentMenu = MAIN;
 				}
 			}
@@ -346,17 +387,6 @@ void main()
 		default: drawMouse(); break;
 		}
 
-		if (printGrid)
-		{
-			const int boxSize = 10;
-
-			for (float x = xSpace(0); x / xSpace(5) != 20; x += xSpace(boxSize))
-			{
-				for (float y = ySpace(20); y / ySpace(5) != 20; y += ySpace(boxSize))
-				{
-					drawBox(x, y, ySpace(boxSize), xSpace(boxSize), RED);
-				}
-			}
-		}
+		
 	}
 }

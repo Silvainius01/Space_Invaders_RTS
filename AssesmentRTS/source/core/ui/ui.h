@@ -53,7 +53,7 @@ public:
 		setName('\0');
 	}
 
-	Button(char *name, float x, float y, float h, float w, unsigned tint = WHITE, TextAlign ta = CENTER, bool c = true)
+	Button(char *name, float x, float y, float h, float w, unsigned tint = clr_WHITE, TextAlign ta = CENTER, bool c = true)
 	{
 		setName(name);
 		setPosDim(x, y, h, w);
@@ -61,7 +61,7 @@ public:
 		setClickable(c);
 		setTint(tint);
 	}
-	Button(unsigned sprite, float x, float y, float h, float w, unsigned tint = WHITE, TextAlign ta = CENTER, bool c = true)
+	Button(unsigned sprite, float x, float y, float h, float w, unsigned tint = clr_WHITE, TextAlign ta = CENTER, bool c = true)
 	{
 
 	}
@@ -120,11 +120,12 @@ extern unsigned ui_Background;
 extern unsigned ui_Hotdog;
 extern unsigned ui_Resource;
 extern unsigned ui_Collector;
+extern unsigned ui_Farm;
 
 #define wi_Text			getTextureWidth(ui_Text) / 13
 #define hi_Text			getTextureHeight(ui_Text) / 4
-#define wi_Human		(getTextureWidth(ui_Human) / 2) * 2
-#define hi_Human		getTextureHeight(ui_Human) * 2
+#define wi_Human		(getTextureWidth(ui_Human) / 2) * 2.5
+#define hi_Human		getTextureHeight(ui_Human) * 2.5
 #define wi_Invader		(getTextureWidth(ui_Invader) / 8) * 6
 #define hi_Invader		(getTextureHeight(ui_Invader) / 4) * 6
 #define wi_TownCenter	(getTextureWidth(ui_TownCenter) / 2) * 4
@@ -141,6 +142,8 @@ extern unsigned ui_Collector;
 #define hi_Food			(getTextureHeight(ui_Resource) / 2) * 3
 #define wi_Steel		getTextureWidth(ui_Resource) * (8 / 3)
 #define hi_Steel		(getTextureHeight(ui_Resource) / 2) * 3
+#define wi_Collector	(getTextureWidth(ui_Collector) / 2) * 3
+#define hi_Collector	getTextureHeight(ui_Collector) * 5 / 3 
 
 extern int cti(char a);
 extern char itc(int a);
@@ -148,14 +151,14 @@ extern char ktc(int index, bool shift);
 
 extern void initUI();
 extern void initBuildGrid();
-extern void drawText(const char *string, float x, float y, int multH = 1, int multW = 1, bool drawUp = false, TextAlign ta = RIGHT, unsigned tint = WHITE);
-extern void drawBox(float x, float y, float h, float w, unsigned tint = WHITE);
+extern void drawText(const char *string, float x, float y, int multH = 1, int multW = 1, bool drawUp = false, TextAlign ta = RIGHT, unsigned tint = clr_WHITE);
+extern void drawBox(float x, float y, float h, float w, unsigned tint = clr_WHITE);
 extern void drawMouse(unsigned sprite = ui_Text, int index = 49, float h = hi_Text, float w = wi_Text, float multH = 3, float multW = 3);
 extern void drawBuildGrid();
 
 extern int drawMenu(Button *b, int indexLimiter = -1, bool constHighlight = false);
 extern int getSelectedColor();
 extern void drawGameOverlay();
-extern void drawSelBox(Button b, unsigned forceTint = NONE);
+extern void drawSelBox(Button b, unsigned forceTint = clr_NONE);
 
 extern float blerg;

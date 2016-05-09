@@ -6,6 +6,8 @@
 using namespace std;
 using namespace sfw;
 
+int rotation = 0;
+
 PosDim	 Entity::getPosDim()			{ return pd; }
 int		 Entity::getOwner()				{ return ownerIndex; }
 unsigned Entity::getSprite()			{ return sprite; }
@@ -34,19 +36,19 @@ float dist(PosDim start, PosDim end)
 
 void initEnts()
 {
-	u_Empty		= Unit();
-	u_AllDynam	= new Unit[unitSpawnIndex];
-	u_AllDynam[0] = u_Empty;
+	u_Empty				= Unit();
+	u_AllDynam			= new Unit[unitSpawnIndex];
+	u_AllDynam[0]		= u_Empty;
 					//ID, Name, Sprite, HP, DMG, Speed, Range, Attack Speed, owner index
-	u_Human		= Unit(0, "Human\nSoldier", ui_Human, 0, 1, 50, 5, 30.0f, 100.0f, 1.15f, 0);
-	u_Invader	= Unit(1, "Invader\nSoldier", ui_Invader, 0, 2, 75, 2, 33.0f, 75.0f, 0.35f, 1);
-	u_Hotdog	= Unit(2, "Hotdog", ui_Hotdog, 0, 1, 613, 265, 1145.0f, 132.0f, 0.3065f, 0);
-	u_HumanCollector = Unit(3, "Human\nCollector", ui_Collector, 0, 1, 25, 10, 25.0f, 25.0f, 2.0f, 0);
-	u_InvaderCollector = Unit(4, "Invader\nCollector", ui_Invader, 1, 3, 25, 10, 25.0f, 25.0f, 2.0f, 1);
+	u_Human				= Unit(0, 0, "Human\nSoldier", ui_Human, 0, 1, 50, 5, 30.0f, 100.0f, 1.15f, 0);
+	u_Invader			= Unit(1, 0, "Invader\nSoldier", ui_Invader, 0, 2, 75, 2, 33.0f, 75.0f, 0.35f, 1);
+	u_Hotdog			= Unit(2, 0, "Hotdog", ui_Hotdog, 0, 1, 613, 265, 1145.0f, 132.0f, 0.3065f, 0);
+	u_HumanCollector	= Unit(3, 1, "Human\nCollector", ui_Collector, 0, 1, 25, 10, 25.0f, 50.0f, 2.0f, 0);
+	u_InvaderCollector	= Unit(4, 1, "Invader\nCollector", ui_Invader, 1, 3, 25, 10, 25.0f, 25.0f, 2.0f, 1);
 
-	b_Empty		= Building();
-	b_AllDynam	= new Building[buildSpawnIndex];
-	b_AllDynam[0] = b_Empty;
+	b_Empty				= Building();
+	b_AllDynam			= new Building[buildSpawnIndex];
+	b_AllDynam[0]		= b_Empty;
 
 	b_HumanTC			= Building(0, "Town\nCenter", ui_TownCenter, 2, 3, 500, 0, 0, 0, 0, 0);
 	b_HumanTower		= Building(1, "Tower", ui_Tower, 1, 3, 300, 25, 150.0f, 1.5f, 200, 0);
@@ -54,18 +56,19 @@ void initEnts()
 	b_InvaderTC			= Building(3, "Town\nCenter", ui_TownCenter, 0, 1, 500, 0, 0, 0, 0, 1);
 	b_InvaderTower		= Building(4, "Tower", ui_Tower, 0, 2, 300, 25, 150.0f, 1.5f, 200, 1);
 	b_InvaderBarracks   = Building(5, "Barracks", ui_Barracks, 0, 1, 200, 0, 0.0f, 0.0f, 350, 1);
-	//b_Farm = Building(6, "Farm", )
+	b_HumanFarm			= Building(6, "Farm", ui_Farm, 0, 1, 150, 0, 0, 0, 100, 0);
+	b_InvaderFarm		= Building(7, "Farm", ui_Farm, 0, 1, 150, 0, 0, 0, 100, 1);
 
-	blt_Empty = Bullet();
-	blt_AllDynam = new Bullet[bulletSpawnIndex];
+	blt_Empty		= Bullet();
+	blt_AllDynam	= new Bullet[bulletSpawnIndex];
 	blt_AllDynam[0] = blt_Empty;
 
-	r_Empty = Resource();
-	r_AllDynam = new Resource[resourceSpawnIndex];
-	r_AllDynam[0] = r_Empty;
+	r_Empty			= Resource();
+	r_AllDynam		= new Resource[resourceSpawnIndex];
+	r_AllDynam[0]	= r_Empty;
 
-	r_Steel = Resource(0, "Steel\nCache", ui_Resource, 0, 0, 500, 0.5f);
-	r_Food	= Resource(1, "Food\nCache", ui_Resource, 1, 1, 500, 0.5f);
+	r_Steel			= Resource(0, "Steel\nCache", ui_Resource, 0, 0, 500, 0.5f);
+	r_Food			= Resource(1, "Food\nCache", ui_Resource, 1, 1, 500, 0.5f);
 }
 
 void checkCollision(Unit &u, int index, bool isBuild = false)
@@ -200,6 +203,13 @@ void updateEnts()
 		if (b_Current == b_Empty) { continue; }
 		_pd = b_Current.getPosDim();
 
+		if ((rotation / 90) % 2 != 0)
+		{
+			float save = _pd.w;
+			_pd.w = _pd.h;
+			_pd.h = save;
+		}
+
 		//Despawn dead buildings
 		if (b_Current.getHP() <= 0)
 		{
@@ -222,21 +232,28 @@ void updateEnts()
 		else
 		{
 			updateQueue(b_Current);
-			drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, b_Current.getSpriteIndex());
+			drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, b_Current.getSpriteIndex());
 			if (b_Current == b_HumanTC || b_Current == b_HumanTower || b_Current == b_HumanBarracks)
 			{
-				drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, b_Current.getColoredIndex(), p_Player.getPlayerColor());
+				drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, b_Current.getColoredIndex(), p_Player.getPlayerColor());
 			}
 			else if (b_Current == b_InvaderTC || b_Current == b_InvaderTower || b_Current == b_InvaderBarracks)
 			{
-				drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, b_Current.getColoredIndex(), p_AI.getPlayerColor());
+				drawTexture(b_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, b_Current.getColoredIndex(), p_AI.getPlayerColor());
 			}
 
 			if (b_Current == b_InvaderTower || b_Current == b_HumanTower) { checkForTargets(b_Current); }
 
 			if (b_Current.getSelected())
 			{
-				drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, MAGENTA);
+				if ((rotation / 90) % 2 != 0)
+				{
+					float save = _pd.w;
+					_pd.w = _pd.h;
+					_pd.h = save;
+				}
+
+				drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, clr_MAGENTA);
 				if (!isBuildOnOverlay) { isBuildOnOverlay = true; entOnOverlay = a; }
 			}
 		}
@@ -250,22 +267,30 @@ void updateEnts()
 			//Despawn dead units
 			if (u_Current.getHP() <= 0) 
 			{ 
-				if (u_Current == u_Invader) { p_Player.addMoney(10); }
-				else if (u_Current == u_Human) { p_AI.addMoney(10); }
+				if (u_Current.getOwner() == 1) { p_Player.addMoney(10); }
+				else if (u_Current.getOwner() == 0) { p_AI.addMoney(10); }
 				u_Current = u_Empty; 
 			}
 			else
 			{
 				_pd = u_Current.getPosDim();
 
+				if ((rotation / 90) % 2 != 0)
+				{
+					float save = _pd.w;
+					_pd.w = _pd.h;
+					_pd.h = save;
+				}
+
 				//Units only collide with each other if they don't have a target, because reasons.
 				//Go ahead, comment out that getTarget() parameter. See what happens.
 				if (!u_Current.hasUnitCollided() && u_Current.getTarget() == NOTHING) { getCollisionCandidates(u_Current); }
 				
 				if (u_Current.getTarget() != NOTHING && !u_Current.doesUnitHaveTarget()) { findTarget(u_Current); }
+				else if (u_Current.getTargetedUnit() == -1 || u_Current.getTargetedBuild() == -1) { findTarget(u_Current); }
 				else if (u_Current.getTarget() != NOTHING && u_Current.getDistToTar() > u_Current.getAtkRad() * 1.5) { findTarget(u_Current); }
 
-				if (u_Current.isTargetInRange()) { shootTarget(u_Current); }
+				if (u_Current.isTargetInRange() && u_Current.getTarget() != NOTHING) { shootTarget(u_Current); }
 				
 				if (u_Current.isUnitMoving() && !u_Current.isTargetInRange()) { moveUnit(u_Current); }
 				
@@ -275,20 +300,26 @@ void updateEnts()
 					u_Current.setUnitCollision(false);
 				}
 
-				drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, u_Current.getSpriteIndex());
+				drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, u_Current.getSpriteIndex());
 				if (u_Current.getOwner() == 0)
 				{
-					drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, u_Current.getColoredIndex(), p_Player.getPlayerColor());
+					drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, u_Current.getColoredIndex(), p_Player.getPlayerColor());
 				}
 				else if (u_Current.getOwner() == 1)
 				{
-					drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, u_Current.getColoredIndex(), p_AI.getPlayerColor());
+					drawTexture(u_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, u_Current.getColoredIndex(), p_AI.getPlayerColor());
 				}
 
 
 				if (u_Current.getSelected())
 				{
-					drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, MAGENTA);
+					if ((rotation / 90) % 2 != 0)
+					{
+						float save = _pd.w;
+						_pd.w = _pd.h;
+						_pd.h = save;
+					}
+					drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, clr_MAGENTA);
 					if (!isUnitOnOverlay) { isUnitOnOverlay = true; entOnOverlay = a; }
 				}
 			}
@@ -302,25 +333,38 @@ void updateEnts()
 
 		_pd = r_Current.getPosDim();
 
+		if ((rotation / 90) % 2 != 0) 
+		{ 
+			float save = _pd.w;
+			_pd.w = _pd.h;
+			_pd.h = save;
+		}
+
 		switch (r_Current.getID())
 		{
 		case 1:
-			drawTexture(r_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 90, true, r_Current.getSpriteIndex());
+			drawTexture(r_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation + 90, true, r_Current.getSpriteIndex());
 			break;
 		default:
-			drawTexture(r_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, 0, true, r_Current.getSpriteIndex());
+			drawTexture(r_Current.getSprite(), _pd.x, _pd.y, _pd.w, _pd.h, rotation, true, r_Current.getSpriteIndex());
 		}
 
 		if (r_Current.getSelected())
 		{
+			if ((rotation / 90) % 2 != 0)
+			{
+				float save = _pd.w;
+				_pd.w = _pd.h;
+				_pd.h = save;
+			}
 			switch (r_Current.getID())
 			{
 			case 1:
 				_pd.w = frac<float>(_pd.w, 7, 10);
-				drawBox(_pd.x - (_pd.h / 2), _pd.y - (_pd.w / 2), _pd.w, _pd.h, MAGENTA);
+				drawBox(_pd.x - (_pd.h / 2), _pd.y - (_pd.w / 2), _pd.w, _pd.h, clr_MAGENTA);
 				break;
 			default:
-				drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, MAGENTA);
+				drawBox(_pd.x - (_pd.w / 2), _pd.y - (_pd.h / 2), _pd.h, _pd.w, clr_MAGENTA);
 			}
 
 			if (!isResourceOnOverlay) { isResourceOnOverlay = true; entOnOverlay = a; }

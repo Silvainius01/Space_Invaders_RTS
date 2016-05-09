@@ -39,7 +39,7 @@ int aih_CU()
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human) { count++; }
+		if (u_Current.getOwner() == 0) { count++; }
 	}
 
 	return count;
@@ -52,11 +52,11 @@ int aih_CUDT(UnitTask ut)
 	switch (ut)
 	{
 	case IDLE:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Human && u_Current.getTarget() == NOTHING) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 0 && u_Current.getTarget() == NOTHING) { count++; } } break;
 	case FIGHT_UNITS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Human && u_Current.getTarget() == UNITS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 0 && u_Current.getTarget() == UNITS) { count++; } } break;
 	case FIGHT_BUILDS:
-		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current == u_Human && u_Current.getTarget() == BUILDINGS) { count++; } } break;
+		for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 0 && u_Current.getTarget() == BUILDINGS) { count++; } } break;
 	}
 
 	return count;
@@ -68,7 +68,7 @@ int aih_CPU()
 	int count = 0;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			count++;
 		}
@@ -87,7 +87,7 @@ int aih_CPUNB(bool countBuildingAttackers)
 
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader && u_Current.getTarget() == BUILDINGS)
+		if (u_Current.getOwner() == 1 && u_Current.getTarget() == BUILDINGS)
 		{
 			pd = u_Current.getPosDim();
 			bpd = b_AllDynam[u_Current.getTargetedBuild()].getPosDim();
@@ -108,7 +108,7 @@ int aih_CPUIA(float x, float y, float h, float w, bool countOut = false)
 	PosDim pd;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Invader)
+		if (u_Current.getOwner() == 1)
 		{
 			pd = u_Current.getPosDim();
 
@@ -136,7 +136,7 @@ int aih_CMUIA(float x, float y, float h, float w, bool countOut = false)
 	PosDim pd;
 	for (int a = 0; a < unitSpawnIndex; a++)
 	{
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			pd = u_Current.getPosDim();
 
@@ -196,7 +196,7 @@ void aih_SUT(const int numUnits, UnitTask task)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			switch (task)
 			{
@@ -222,7 +222,7 @@ void aih_RUFM(const int numUnits, UnitTask task)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			if (u_Current.getTarget() == NOTHING) { continue; }
 			else { u_Current.setTarget(NOTHING); b--; }
@@ -254,7 +254,7 @@ void aih_SUTFUT(const int numUnits, UnitTask doThis, UnitTask notThis)
 
 		if (b == 0) { a = unitSpawnIndex; continue; }
 
-		if (u_Current == u_Human)
+		if (u_Current.getOwner() == 0)
 		{
 			if (u_Current.getTarget() == task)
 			{
@@ -271,7 +271,7 @@ void aih_MU(const int numUnits, float tx, float ty)
 	for (int a = 0, b = numUnits; a < unitSpawnIndex; a++)
 	{
 		if (b == 0) { a = unitSpawnIndex; continue; }
-		if (u_Current == u_Human && u_Current.getTarget() == NOTHING)
+		if (u_Current.getOwner() == 0 && u_Current.getTarget() == NOTHING)
 		{
 			u_Current.setTargetCoords(tx, ty);
 			b--;
@@ -406,7 +406,7 @@ void aih_QU(int numUnits)
 
 	for (int a = comp; a < comp + numUnits; a++)
 	{
-		b_AllDynam[targetBarrack].queue[a] = u_Human.getID();
+		b_AllDynam[targetBarrack].queue[a] = u_Invader.getID();
 	}
 }
 

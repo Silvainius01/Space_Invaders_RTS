@@ -150,9 +150,9 @@ void spawnBuild(Building b, float x, float y)
 		delete[]temp;
 	}
 
-	
 
-	b.setPosDim({ x, y, getBuildH(b), getBuildW(b) });
+	if ((rotation / 90) % 2 != 0) { b.setPosDim({ x, y, getBuildW(b), getBuildH(b) }); }
+	else { b.setPosDim({ x, y, getBuildH(b), getBuildW(b) }); }
 
 	pd = b.getPosDim();
 	for (int y = 0; y < gridY; y++)
@@ -189,9 +189,9 @@ void killBuild()
 
 void addToQueue(Unit u, Building &b)
 {
-	for (int a = 0; a < b.getMaxQueue(); a++)
+	for (int a = 0; a < 10; a++)
 	{
-		if (b.queue[a] == -1) { b.queue[a] = u.getID(); a = b.getMaxQueue(); }
+		if (b.queue[a] == -1) { b.queue[a] = u.getID(); }
 	}
 }
 
@@ -209,17 +209,8 @@ void updateQueue(Building &b)
 	if (b.getElapsedTrainTime() >= trainTime)
 	{
 		b.setElapsedTrainTime(0.0f);
-		switch (b.queue[0])
-		{
-		case 0:
-			spawnUnit(u_Human, pd.x, pd.y - pd.h, xSpace(25), ySpace(75));
-			break;
-		case 1:
-			spawnUnit(u_Invader, pd.x, pd.y + pd.h + xSpace(1), xSpace(75), ySpace(45));
-			break;
-		}
 
-		
+		spawnUnit(findUnitBase(b.queue[0]), b.getOwner(), pd.x, pd.y - pd.h);
 		
 		for (int a = 0; a < b.getMaxQueue() - 1; a++)
 		{

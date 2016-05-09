@@ -54,6 +54,9 @@
     <ClInclude Include="Header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\ui\sfwdraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\core\ent\ent.cpp">
@@ -110,5 +113,6 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="source\core\libraries\sfw.lib" />
+    <Library Include="source\core\ui\sfw.lib" />
   </ItemGroup>
 </Project>

@@ -2,10 +2,17 @@
 #include "../math.h"
 #include "../Game/game.h"
 
+#define NL << endl
+#define PNL cout << endl
+#define P cout << 
+#define _ << ", " <<
+
 Target	Unit::getTarget()				{ return target; }
 int		Unit::getID()					{ return unitID; }
 int		Unit::getTargetedUnit()			{ return u_Target; }
 int		Unit::getTargetedBuild()		{ return b_Target; }
+int		Unit::getUnitType()				{ return unitType; }
+int		Unit::getTargetedResource()		{ return r_Target; }
 float	Unit::getSpeed()				{ return speed; }
 float	Unit::getTargetX()				{ return targetX; }
 float	Unit::getTargetY()				{ return targetY; }
@@ -18,10 +25,10 @@ float	Unit::getAttackSpeed()			{ return atkSpeed; }
 float	Unit::getLastAtk()				{ return lastAtk; }
 float	Unit::getDistToTar()
 {
-	return abs(
-		sqrt(expo<float>(pd.x, 2) + expo<float>(pd.y, 2)) - 
-		sqrt(expo<float>(u_AllDynam[u_Target].getPosDim().x, 2) + expo<float>(u_AllDynam[u_Target].getPosDim().y, 2)));
-}
+	return  abs(
+			sqrt(expo<float>(pd.x - u_AllDynam[u_Target].getPosDim().x, 2) +
+				 expo<float>(pd.y - u_AllDynam[u_Target].getPosDim().y, 2)));
+}	
 bool	Unit::isUnitMoving()			{ return moving; }
 bool	Unit::doesUnitHaveSlope()		{ return hasSlope; }
 bool	Unit::doesUnitHaveSavedCoords() { return hasSavedCoords; }
@@ -44,6 +51,20 @@ void	Unit::setTargetInRange(bool tir)			{ targetInRange = tir; }
 void	Unit::setAttackSpeed(float as)				{ atkSpeed = as; }
 void	Unit::setLastAttack(float la)				{ lastAtk = la; }
 void	Unit::setTargetStatus(bool ht)				{ hasTarget = ht; }
+void	Unit::setUnitType(int t)					{ unitType = t; }
+void	Unit::setTargetedResource(int index)		{ r_Target = index; if (r_AllDynam[index].getID() == 0) { isFoodTarget = false; } hasTarget = true; }
+void	Unit::print()
+{
+	PNL;
+	P unitID _ name NL;
+	P "Target Data: " NL;
+	P target _ u_Target _ b_Target _ r_Target _ "Dist: " << getDistToTar() NL;
+	P hasTarget _ isUnitTarget _ isFoodTarget _ targetInRange NL;
+	P "Movement Data: " NL;
+	P moving _ hasSavedCoords _ hasSlope NL;
+	if (hasSavedCoords) { P "(" << targetX _ targetY << ")" NL; }
+	PNL;
+}
 
 int unitSpawnIndex = 1;
 Unit u_AllBase[unitIndex];
@@ -66,8 +87,9 @@ float getUnitW(Unit &u)
 	switch (idMatch)
 	{
 	case 0: return wi_Human;
-	case 1: return wi_Invader;
+	case 1: case 4: return wi_Invader;
 	case 2: return wi_Hotdog;
+	case 3: return wi_Collector;
 	default: cout << "\nDefaulted with: " << idMatch; return 9;
 	}
 }
@@ -83,13 +105,22 @@ float getUnitH(Unit &u)
 	switch (idMatch)
 	{
 	case 0: return hi_Human;
-	case 1: return hi_Invader;
+	case 1: case 4: return hi_Invader;
 	case 2: return hi_Hotdog;
+	case 3: return hi_Collector;
 	default: cout << "\nDefaulted with: " << idMatch; return 9;
 	}
 }
 
-void spawnUnit(Unit u, float x, float y, float tx, float ty)
+Unit findUnitBase(int ID)
+{
+	for (int a = 1; a < unitIndex; a++)
+		if (ID == u_AllBase[a].getID())
+			return u_AllBase[a];
+	return u_Empty;
+}
+
+void spawnUnit(Unit u, int owner, float x, float y, float tx, float ty)
 {
 	bool isIndexOpen = false;
 	int openIndex;
@@ -118,8 +149,11 @@ void spawnUnit(Unit u, float x, float y, float tx, float ty)
 	}
 
 	if (tx != 0 && ty != 0) { u.setTargetCoords(tx, ty); }
-	u.setPosDim({ x, y, getUnitH(u), getUnitW(u) });
+	//EAS
+	if ((rotation / 90) % 2 != 0) { u.setPosDim({ x, y, getUnitW(u), getUnitH(u) }); }
+	else						  { u.setPosDim({ x, y, getUnitH(u), getUnitW(u) }); }
 	u.setUnitCollision(false);
+	u.setOwner(owner);
 	u_AllDynam[openIndex] = u;
 }
 void killUnits()
@@ -141,31 +175,34 @@ void shootTarget(Unit &u)
 		PosDim temp = u.getPosDim();
 		bool inited = false;
 		float r = u.getAtkRad();
-		if (u.isTargetUnit())
+		switch (u.getUnitType())
 		{
-
-			if (u_Targeted == u_Empty || u == u_Targeted) { u.setTargetStatus(false); u.setTargetInRange(false); }
-			else { blerg = u_Targeted.getPosDim(); inited = true; }
-		}
-		else
-		{
-			if (b_Targeted == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
-			if (b_Targeted.getOwner() == u.getOwner())
+		case 1:
+			if (r_Targeted == r_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+			else { blerg = r_Targeted.getPosDim(); inited = true; }
+			break;
+		default:
+			if (u.isTargetUnit())
 			{
-				u.setTargetStatus(false); u.setTargetInRange(false);
+				if (u_Targeted == u_Empty || u.getOwner() == u_Targeted.getOwner()) { u.setTargetStatus(false); u.setTargetInRange(false); }
+				else { blerg = u_Targeted.getPosDim(); inited = true; }
 			}
-			else { blerg = b_Targeted.getPosDim(); inited = true; }			
+			else
+			{
+				if (b_Targeted == b_Empty || b_Targeted.getOwner() == u.getOwner()) { u.setTargetStatus(false); u.setTargetInRange(false); }
+				else { blerg = b_Targeted.getPosDim(); inited = true; }
+			}
 		}
 
 		if (inited)
 		{
 			float dist = sqrt(expo<float>(abs(temp.x - blerg.x), 2) + expo<float>(abs(temp.y - blerg.y), 2));
-			if (dist < r)
+			if (dist <= r)
 			{
-				u.setLastAttack(0);
+				u.setLastAttack(0.0f);
 				spawnBullet(u, blerg.x, blerg.y);
 			}
-			else if (blerg.x != u.getTargetX() && blerg.y != u.getTargetY());
+			else 
 			{
 				u.setTargetInRange(false);
 				u.setTargetCoords(blerg.x, blerg.y);
@@ -183,11 +220,36 @@ void findTarget(Unit &u)
 	PosDim temp = u.getPosDim();
 	PosDim blerg;
 	PosDim closest = temp;
-	float dist = xSpace(1000);
+	float DIST;
 
 	switch (u.getTarget())
 	{
+	case FOOD:
+		DIST = r_AllDynam[0].getPosDim().x + r_AllDynam[0].getPosDim().y;
+		for (int a = 0; a < resourceSpawnIndex; a++)
+		{
+			if (r_Current == r_Empty || r_Current == r_Steel) { continue; }
+			float comp;
+			blerg = r_Current.getPosDim();
+			comp = dist(temp, blerg);
+			if (comp < DIST) { DIST = comp; u.setTargetedResource(a); closest = blerg; }
+		}
+		u.setTargetCoords(closest.x, closest.y);
+		break;
+	case STEEL:
+		DIST = r_AllDynam[0].getPosDim().x + r_AllDynam[0].getPosDim().y;
+		for (int a = 0; a < resourceSpawnIndex; a++)
+		{
+			if (r_Current == r_Empty || r_Current == r_Food) { continue; }
+			float comp;
+			blerg = r_Current.getPosDim();
+			comp = dist(temp, blerg);
+			if (comp < DIST) { DIST = comp; u.setTargetedResource(a); closest = blerg; }
+		}
+		u.setTargetCoords(closest.x, closest.y);
+		break;
 	case UNITS:
+		DIST = u_AllDynam[0].getPosDim().x + u_AllDynam[0].getPosDim().y;
 		for (int a = 0; a < unitSpawnIndex; a++)
 		{
 			if (u_Current.getOwner() == u.getOwner() || u_Current == u_Empty) { continue; }
@@ -196,12 +258,13 @@ void findTarget(Unit &u)
 				float comp;
 				blerg = u_Current.getPosDim();
 				comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-				if (comp < dist) { dist = comp; u.setTargetedUnit(a); closest = blerg; }
+				if (comp < DIST) { DIST = comp; u.setTargetedUnit(a); closest = blerg; }
 			}
 		}
 		u.setTargetCoords(closest.x, closest.y);
 		break;
 	case BUILDINGS:
+		DIST = b_AllDynam[0].getPosDim().x + b_AllDynam[0].getPosDim().y;
 		for (int a = 0; a < buildSpawnIndex; a++)
 		{
 			if (b_Current.getOwner() == u.getOwner() || b_Current == b_Empty) { continue; }
@@ -210,7 +273,7 @@ void findTarget(Unit &u)
 				float comp;
 				blerg = b_Current.getPosDim();
 				comp = sqrt(expo<float>(abs(blerg.x - temp.x), 2) + expo<float>(abs(blerg.y - temp.y), 2));
-				if (comp < dist) { dist = comp; u.setTargetedBuild(a); closest = blerg; }
+				if (comp < DIST) { DIST = comp; u.setTargetedBuild(a); closest = blerg; }
 			}
 		}
 		u.setTargetCoords(closest.x, closest.y);
@@ -232,27 +295,36 @@ void moveUnit(Unit &u)
 			bool inited = false;
 			PosDim blerg;
 
-			if (u.isTargetUnit())
+			switch (u.getUnitType())
 			{
-				if (u_AllDynam[u.getTargetedUnit()] == u_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
-				else { blerg = u_AllDynam[u.getTargetedUnit()].getPosDim(); inited = true; }
-			}
-			else
-			{
-				if (b_AllDynam[u.getTargetedBuild()] == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
-				else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+			case 1:
+				if (r_AllDynam[u.getTargetedResource()] == r_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+				else { blerg = r_AllDynam[u.getTargetedResource()].getPosDim(); inited = true; }
+				break;
+			default:
+				if (u.isTargetUnit())
+				{
+					if (u_AllDynam[u.getTargetedUnit()] == u_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+					else { blerg = u_AllDynam[u.getTargetedUnit()].getPosDim(); inited = true; }
+				}
+				else
+				{
+					if (b_AllDynam[u.getTargetedBuild()] == b_Empty) { u.setTargetStatus(false); u.setTargetInRange(false); }
+					else { blerg = b_AllDynam[u.getTargetedBuild()].getPosDim(); inited = true; }
+				}
 			}
 
 			if (inited)
 			{
 				float dist = sqrt(expo<float>(abs(temp.x - blerg.x), 2) + expo<float>(abs(temp.y - blerg.y), 2));
-				if (dist < r)
+				if (dist <= r)
 				{
 					u.stopMoving();
 					u.setTargetInRange(true);
 				}
-				else if (blerg.x != u.getTargetX() && blerg.y != u.getTargetY());
+				else
 				{
+					u.setTargetInRange(false);
 					u.setTargetCoords(blerg.x, blerg.y);
 				}
 			}

@@ -32,7 +32,9 @@ enum Target
 {
 	NOTHING = -1,
 	UNITS = 0,
-	BUILDINGS = 4,
+	FOOD = 1,
+	STEEL = 2,
+	BUILDINGS = 4
 };
 
 class Entity
@@ -68,6 +70,13 @@ public:
 	void setCost(int c);
 	void setOwner(int playerIndex);
 };
+extern int rotation;
+#define getX getPosDim().x
+#define getY getPosDim().y
+#define getH getPosDim().h
+#define getW getPosDim().w
+#define getPos { getX, getY, -1, -1 }
+#define getDim { -1, -1, getH, getW }
 
 class Unit : public Entity
 {
@@ -75,12 +84,13 @@ private:
 	Target target = NOTHING;
 	int u_Target = -1;
 	int b_Target = -1;
+	int r_Target = -1;
+	int unitID, unitType;
 	float speed, speedX, speedY;
 	float atkSpeed, atkRad, lastAtk = 0.0f;
 	float saveTX, targetX, targetY, saveTY;
 	bool moving = false, hasSlope = false, hasSavedCoords = false, collided = false;
-	bool hasTarget = false, isUnitTarget = true, targetInRange = false;
-	int unitID;
+	bool hasTarget = false, isUnitTarget = true, isFoodTarget = false, targetInRange = false;
 public:
 	//Always false for humans. It is a flag used by the AI for grouping.
 	bool groupFlag = false;
@@ -100,6 +110,8 @@ public:
 	int getID();
 	int getTargetedUnit();
 	int getTargetedBuild();
+	int getTargetedResource();
+	int getUnitType();
 	bool isUnitMoving();
 	bool doesUnitHaveSlope();
 	bool doesUnitHaveSavedCoords();
@@ -111,6 +123,7 @@ public:
 	void setTarget(Target t);
 	void setSpeed(float s);
 	void setID(int ID);
+	void setUnitType(int t);
 	void setTargetCoords(float x, float y);
 	void stopMoving();
 	void setAxisSpeeds(float sx, float sy);
@@ -119,10 +132,13 @@ public:
 	void setUnitCollision(bool hasCollided);
 	void setTargetedUnit(int index);
 	void setTargetedBuild(int index);
+	void setTargetedResource(int index);
 	void setTargetInRange(bool tir);
 	void setAttackSpeed(float as);
 	void setLastAttack(float la);
 	void setTargetStatus(bool ht);
+	void print();
+
 	//Default Constructor
 	Unit(void)
 	{
@@ -153,12 +169,13 @@ public:
 		groupFlag = false;
 		ownerIndex = -1;
 		lastAtk = 0;
+		unitType = -1;
 	}
 	//Verbose constructor
-	Unit(int ID, char *name, unsigned sprite, int spriteIndex, int colorIndex, int HP, int DMG, float spd, float range, float attackSpeed,int ownerIndex)
+	Unit(int ID, int unitType, char *name, unsigned sprite, int spriteIndex, int colorIndex, int HP, int DMG, float spd, float range, float attackSpeed,int ownerIndex)
 	{
 		setHP(HP); setDMG(DMG); setSpeed(spd);
-		setSprite(sprite); setID(ID);
+		setSprite(sprite); setID(ID); setUnitType(unitType);
 		setSpriteIndex(spriteIndex); setColoredIndex(colorIndex);
 		setName(name); setAtkRad(range);
 		setAttackSpeed(attackSpeed);
@@ -197,6 +214,7 @@ public:
 		groupFlag       = u.groupFlag;
 		ownerIndex		= u.getOwner();
 		lastAtk			= u.getLastAtk();
+		unitType		= u.getUnitType();
 		return *this;
 	}
 	bool operator==(Unit &u)
@@ -222,6 +240,9 @@ extern Unit *u_AllDynam;
 #define u_InvaderCollector u_AllBase[5]
 #define u_Current	u_AllDynam[a]
 #define u_Targeted	u_AllDynam[u.getTargetedUnit()]
+#define u_EntOnOverlay u_AllDynam[entOnOverlay]
+#define b_EntOnOverlay b_AllDynam[entOnOverlay]
+#define r_EntOnOverlay r_AllDynam[entOnOverlay]
 
 class Building : public Entity
 {
@@ -298,8 +319,9 @@ public:
 		if (b.getID() == this->getID()) { return true; }
 		else { return false; }
 	}
+	operator int() const { return buildingID; }
 };
-const int buildingIndex = 8;
+const int buildingIndex = 9;
 extern int buildSpawnIndex;
 extern Building b_AllBase[buildingIndex];
 extern Building *b_AllDynam;
@@ -310,7 +332,8 @@ extern Building *b_AllDynam;
 #define b_InvaderTC			b_AllBase[4]
 #define b_InvaderTower		b_AllBase[5]
 #define b_InvaderBarracks	b_AllBase[6]
-#define b_Farm				b_AllBase[7]
+#define b_HumanFarm			b_AllBase[7]
+#define b_InvaderFarm		b_AllBase[8]
 #define b_Current			b_AllDynam[a]
 #define b_Targeted			b_AllDynam[u.getTargetedBuild()]
 
@@ -432,6 +455,8 @@ public:
 		if (resourceID == r.getID()) { return true; }
 		return false;
 	}
+
+	operator int() const { return resourceID; }
 };
 const int resourceIndex = 3;
 extern int resourceSpawnIndex;
@@ -441,6 +466,7 @@ extern Resource *r_AllDynam;
 #define r_Steel r_AllBase[1]
 #define r_Food r_AllBase[2]
 #define r_Current r_AllDynam[a]
+#define r_Targeted r_AllDynam[u.getTargetedResource()]
 
 
 extern float dist(PosDim start, PosDim end);
@@ -452,12 +478,13 @@ extern void selectEnts(float selbox[4]);
 
 //In entUnit.cpp
 
-extern void spawnUnit(Unit u, float x = getMouseX(), float y = getMouseY(), float tx = 0, float ty = 0);
+extern void spawnUnit(Unit u, int owner, float x = getMouseX(), float y = getMouseY(), float tx = 0, float ty = 0);
 extern void updateEnts();
 extern void moveSelectedUnits();
 extern void moveUnit(Unit &u);
 extern void findTarget(Unit &u);
 extern void shootTarget(Unit &u);
+extern Unit findUnitBase(int ID);
 
 //In entBuild.cpp
 
@@ -468,7 +495,7 @@ extern void checkForTargets(Building &b);
 
 //In entBullet.cpp
 
-extern void spawnBullet(Unit u, float tx, float ty);
+extern void spawnBullet(Unit &u, float tx, float ty);
 extern void spawnBullet(Building b, float tx, float ty);
 extern void moveBullet(Bullet &blt);
 extern void bulletCollision();

@@ -131,6 +131,7 @@
     <ClInclude Include="source\core\libraries\sfwdraw.h" />
     <ClInclude Include="source\core\math.h" />
     <ClInclude Include="source\core\ui\input.h" />
+    <ClInclude Include="source\core\ui\sfwdraw.h" />
     <ClInclude Include="source\core\ui\ui.h" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </Library>
+    <Library Include="source\core\ui\sfw.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

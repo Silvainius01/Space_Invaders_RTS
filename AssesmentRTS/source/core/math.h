@@ -24,6 +24,13 @@ T expo(const T base, const T power)
 		return 1 / ans;
 	}
 }
+template<typename T>
+T plusMinus(T base, T factor)
+{
+	int rand = std::rand() % 2;
+	if (rand == 0) { return base + factor; }
+	else { return base - factor; }
+}
 
 extern int getTensPlace(int num);
 extern int getHundredsPlace(int num);

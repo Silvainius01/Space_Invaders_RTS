@@ -3,9 +3,12 @@
 
 #define KEY_B 66
 #define KEY_C 67
+#define KEY_E 69
 #define KEY_H 72
 #define KEY_I 73
 #define KEY_M 77
+#define KEY_O 79
+#define KEY_P 80
 #define KEY_R 82
 #define KEY_T 84
 #define KEY_U 85
@@ -18,7 +21,7 @@
 #define SHF_C 1002
 #define SHF_T 1003
 
-const int bindIndex = 11;
+const int bindIndex = 14;
 extern int bindings[bindIndex];
 
 extern bool startDCT;

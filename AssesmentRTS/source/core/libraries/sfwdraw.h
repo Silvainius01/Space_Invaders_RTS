@@ -44,15 +44,16 @@ NOTE: YOU MUST CALL initContext for any of the functions to work!
 // every 2 hexits corresponds to an 8-bit color component value.
 // look at the following values to intuit what that means.
 // In RGBA color format
-#define WHITE	 0xffffffff //
-#define BLACK    0x000000ff
-#define CYAN	 0x00ffffff //
-#define MAGENTA  0xff00ffff //
-#define YELLOW	 0xffff00ff //
-#define RED		 0xff0000ff //
-#define GREEN    0x00ff00ff //
-#define BLUE	 0x0000ffff //
-#define NONE     0x00000000 
+#define clr_WHITE	 0xffffffff //
+#define clr_BLACK    0x000000ff
+#define clr_CYAN	 0x00ffffff //
+#define clr_MAGENTA  0xff00ffff //
+#define clr_YELLOW	 0xffff00ff //
+#define clr_RED		 0xff0000ff //
+#define clr_GREEN    0x00ff00ff //
+#define clr_BLUE	 0x0000ffff //
+#define clr_STEEL    0x8c8888ff
+#define clr_NONE     0x00000000 
 
 #define PI 3.14159265359
 
@@ -79,14 +80,14 @@ namespace sfw
 	// index		  : If loadTextureMap was given rows and cols, index will fetch the corresponding sub-image
 	// tint			  : a hex color value applied as a tint to the texture
 	// transform	  : a 4x4 transformation matrix that could  be used for parenting.
-	void drawTexture(unsigned handle, float x, float y, float width = 1, float height = 1, float angle = 0, bool centered = true, unsigned index = 0, unsigned int tint = WHITE, const float transform[16] = identity);
+	void drawTexture(unsigned handle, float x, float y, float width = 1, float height = 1, float angle = 0, bool centered = true, unsigned index = 0, unsigned int tint = clr_WHITE, const float transform[16] = identity);
 	
 	// used internally for all texture draw calls.
 	// handle		  : Texture handle returned from loadTextureMap
 	// index		  : If loadTextureMap was given rows and cols, index will fetch the corresponding sub-image
 	// tint			  : a hex color value applied as a tint to the texture
 	// transform	  : a 4x4 transformation matrix
-	void drawTextureMatrix(unsigned handle, unsigned index = 0, unsigned int tint = WHITE, const float transform[16] = identity);
+	void drawTextureMatrix(unsigned handle, unsigned index = 0, unsigned int tint = clr_WHITE, const float transform[16] = identity);
 	
 	// verbose wrapper for drawTextureMatrix, focusing on drawing strings of text.
 	// search "bitmap font" for some examples.
@@ -99,12 +100,12 @@ namespace sfw
 	// offset		  : What character does our bitmap font start with? ' ' is common.
 	// tint			  : a hex color value applied as a tint to the texture
 	// transform	  : a 4x4 transformation matrix, applied as a parent transform
-	void drawString(unsigned handle, const char *text, float x, float y, float width = 1, float height = 1, float angle = 0, char offset = '\0', unsigned int tint = WHITE, const float transform[16] = identity);
+	void drawString(unsigned handle, const char *text, float x, float y, float width = 1, float height = 1, float angle = 0, char offset = '\0', unsigned int tint = clr_WHITE, const float transform[16] = identity);
 
 	// draws just the diagonal line of a quad, using the transformation matrix to buff it out
 	// tint			  : hex color value
 	// transform	  : a 4x4 transformation matrix
-	void drawLineMatrix(unsigned tint = WHITE, const float transform[16] = identity);
+	void drawLineMatrix(unsigned tint = clr_WHITE, const float transform[16] = identity);
 
 	// verbose wrapper for drawLineMatrix
 	// x1,y1,x2,y2	  : first and second position of the line.

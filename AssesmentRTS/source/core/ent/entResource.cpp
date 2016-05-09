@@ -58,7 +58,8 @@ void spawnResource(Resource r, float x, float y)
 		delete[] temp;
 	}
 
-	r.setPosDim({ x, y, getReourceH(r), getResourceW(r) });
+	if ((rotation / 90) % 2 != 0) { r.setPosDim({ x, y, getResourceW(r), getReourceH(r) }); }
+	else { r.setPosDim({ x, y, getReourceH(r), getResourceW(r) }); }
 	r_AllDynam[openIndex] = r;
 }
 

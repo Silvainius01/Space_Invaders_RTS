@@ -8,7 +8,7 @@ using namespace std;
 					//Silvainius
 					//CrimsonRogue
 char *profileName =	 "Silvainius";
-unsigned playerColor = BLUE;
+unsigned playerColor = clr_BLUE;
 
 void saveProfile()
 {
