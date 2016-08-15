@@ -13,7 +13,7 @@ bool clickedR = false;
 bool clickedL = false;
 bool isUserInMenu = true;
 bool printGrid = false;
-bool debug = true;
+bool debug = false;
 bool first = true;
 bool ai = true;
 bool aih = false;
@@ -21,6 +21,7 @@ bool chatBoxOpen = false;
 bool chatShift = false;
 int chatPlace = 0;
 int chatKey;
+int profLoadIndex = 0;
 float x, y;
 float tempTimer = 0.0f;
 char chat[30];
@@ -228,6 +229,8 @@ void debugMenuMode()
 		case 2: m_CurrentMenu = OPTION; break;
 		default: break;
 		}
+		if (getKey(KEY_TAB))
+			saveProfile();
 		break;
 	case PLAY:
 		switch (drawMenu(m_Play))
@@ -240,12 +243,24 @@ void debugMenuMode()
 	case OPTION:
 		switch (drawMenu(m_Optn))
 		{
-		case 1: m_CurrentMenu = OPT_PROFILE; break;
+		case 1: 
+			m_CurrentMenu = OPT_PROFILE; 
+			if (makeProfMenu() == -1) { m_CurrentMenu = DEFAULT; }
+			break;
 		case 2: m_CurrentMenu = OPT_CONTROLS; break;
 		case 3: m_CurrentMenu = OPT_SCREEN; break;
 		case 4: m_CurrentMenu = OPT_COLOR; break;
 		case 5: m_CurrentMenu = MAIN; break;
 		default: break;
+		}
+		break;
+	case OPT_PROFILE:
+		profLoadIndex = drawMenu(profMenu);
+		switch (profLoadIndex)
+		{
+		case -1: break;
+		case 1: m_CurrentMenu = OPTION; break;
+		default: loadProfile(profMenu[profLoadIndex].getName()); break;
 		}
 		break;
 	case OPT_CONTROLS:
@@ -277,7 +292,56 @@ void debugMenuMode()
 		case 7: playerColor = clr_GREEN; break;
 		case 8: playerColor = clr_WHITE; break;
 		case 9: m_CurrentMenu = OPTION; break;
+		case 10: m_CurrentMenu = CLR_SLIDER; m_Slider[4].setTint(playerColor); break;
 		default: drawSelBox(m_Clr[getSelectedColor()], clr_BLACK); break;
+		}
+		break;
+	case CLR_SLIDER:
+		switch (drawMenu(m_Slider, -1, false, true))
+		{
+		case 0:
+			if (getMouseY() + ySpace(2) >= ySpace(30) && getMouseY() + ySpace(2) <= ySpace(60))
+			{
+				m_Slider[0].setYPos(getMouseY() + ySpace(2));
+				RGBA[0] = 0xFF * (int)(m_Slider[0].getYPos() - ySpace(30)) / (int)ySpace(30) * 0x01000000 ;
+				m_Slider[0].setTint(RGBA[0] + 255);
+			} 
+			m_Slider[4].setTint(RGBA[0] + RGBA[1] + RGBA[2] + RGBA[3]);
+			break;
+		case 1:
+			if (getMouseY() + ySpace(2) >= ySpace(30) && getMouseY() + ySpace(2) <= ySpace(60))
+			{
+				m_Slider[1].setYPos(getMouseY() + ySpace(2));
+				RGBA[1] = 0xFF * (int)(m_Slider[1].getYPos() - ySpace(30)) / (int)ySpace(30) * 0x010000;
+				m_Slider[1].setTint(RGBA[1] + 255);
+			}
+			m_Slider[4].setTint(RGBA[0] + RGBA[1] + RGBA[2] + RGBA[3]);
+			break;
+		case 2:
+			if (getMouseY() + ySpace(2) >= ySpace(30) && getMouseY() + ySpace(2) <= ySpace(60))
+			{
+				m_Slider[2].setYPos(getMouseY() + ySpace(2));
+				RGBA[2] = 0xFF * (int)(m_Slider[2].getYPos() - ySpace(30)) / (int)ySpace(30) * 0x0100;
+				m_Slider[2].setTint(RGBA[2] + 255);
+			}
+			m_Slider[4].setTint(RGBA[0] + RGBA[1] + RGBA[2] + RGBA[3]);
+			break;
+		case 3:
+			if (getMouseY() + ySpace(2) >= ySpace(30) && getMouseY() + ySpace(2) <= ySpace(60))
+			{
+				m_Slider[3].setYPos(getMouseY() + ySpace(2));
+				RGBA[3] = 0xFF * (int)(m_Slider[3].getYPos() - ySpace(30)) / (int)ySpace(30) * 0x01;
+				m_Slider[3].setTint(RGBA[3]);
+			}
+			m_Slider[4].setTint(RGBA[0] + RGBA[1] + RGBA[2] + RGBA[3]);
+			break;
+		case 5:
+			playerColor = m_Slider[4].getTint();
+			break;
+		case 6: 
+			m_CurrentMenu = OPT_COLOR;
+			break;
+		default: break;
 		}
 		break;
 	/*case OPT_CTRL_MOVE:
@@ -297,6 +361,7 @@ void main()
 {
 	initContext(SCREEN[0], SCREEN[1], "RTS");
 	initUI();
+	initRGBA();
 	initEnts();
 	initBuildGrid();
 
@@ -306,8 +371,6 @@ void main()
 	{
 		chat[a] = '\0';
 	}
-
-	
 
 	while (stepContext())
 	{

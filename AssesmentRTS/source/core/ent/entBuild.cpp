@@ -191,7 +191,11 @@ void addToQueue(Unit u, Building &b)
 {
 	for (int a = 0; a < 10; a++)
 	{
-		if (b.queue[a] == -1) { b.queue[a] = u.getID(); }
+		if (b.queue[a] == -1) 
+		{ 
+			b.queue[a] = u.getID(); 
+			return;
+		}
 	}
 }
 

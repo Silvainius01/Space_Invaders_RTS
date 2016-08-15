@@ -1,24 +1,11 @@
-﻿  main.cpp
-d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\./ent/ent.h(376): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-source\core\main.cpp(208): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-source\core\main.cpp(210): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-source\core\main.cpp(212): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
-source\core\main.cpp(298): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
-source\core\main.cpp(303): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-source\core\main.cpp(380): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-source\core\main.cpp(384): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-source\core\main.cpp(384): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  menu.cpp
-d:\programming\school\assesments\assesmentrts\assesmentrts\source\core\ui\../ent/ent.h(376): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-source\core\ui\menu.cpp(90): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-source\core\ui\menu.cpp(98): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-source\core\ui\menu.cpp(150): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+﻿  save.cpp
+source\core\fileio\save.cpp(71): warning C4102: 'TRY_CREATE': unreferenced label
   Generating code
-  115 of 892 functions (12.9%) were compiled, the rest were copied from previous compilation.
+  0 of 1052 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    20 functions had inline decision re-evaluated but remain unchanged
+    37 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-sfw.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
-sfw.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
-sfw.lib(crenderutils.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(crenderutils.obj)' or at 'D:\Programming\School\Assesments\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
-  AssesmentRTS.vcxproj -> D:\Programming\School\Assesments\AssesmentRTS\Release\AssesmentRTS.exe
+sfw.lib(sfwdraw.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(sfwdraw.obj)' or at 'D:\Programming\School\Assesments\Year1\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+sfw.lib(gl_core_4_4.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(gl_core_4_4.obj)' or at 'D:\Programming\School\Assesments\Year1\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+sfw.lib(crenderutils.obj) : warning LNK4099: PDB 'nsfw2draw.pdb' was not found with 'sfw.lib(crenderutils.obj)' or at 'D:\Programming\School\Assesments\Year1\AssesmentRTS\Release\nsfw2draw.pdb'; linking object as if no debug info
+  AssesmentRTS.vcxproj -> D:\Programming\School\Assesments\Year1\AssesmentRTS\Release\AssesmentRTS.exe

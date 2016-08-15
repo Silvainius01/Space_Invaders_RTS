@@ -1,6 +1,8 @@
 #pragma once
 #include "../libraries/sfwdraw.h"
 #include <cstring>
+#include <string>
+using namespace std;
 using namespace sfw;
 
 #define PRINT cout <<
@@ -19,14 +21,14 @@ class Button
 private:
 	TextAlign ta;
 	float xPos, yPos, height, width;
-	char *string;
+	char _string[256];
 	bool clickable;
 	bool usesSprite = false; bool highlighted = false;
 	unsigned tint;
 	unsigned sprite;
 public:
 	TextAlign getAllign();
-	char* getName();
+	const char* getName() const;
 	float getXPos();
 	float getYPos();
 	float getHeight();
@@ -50,7 +52,7 @@ public:
 
 	Button(void)
 	{
-		setName('\0');
+		setName("");
 	}
 
 	Button(char *name, float x, float y, float h, float w, unsigned tint = clr_WHITE, TextAlign ta = CENTER, bool c = true)
@@ -79,7 +81,8 @@ enum Menu
 	OPT_CTRL_MOVE = 6,
 	OPT_CTRL_HOTKEY = 7,
 	OPT_COLOR = 8,
-	OPT_SCREEN = 9
+	OPT_SCREEN = 9,
+	CLR_SLIDER = 10
 };
 extern Menu m_CurrentMenu;
 extern Button m_Dflt[3];
@@ -88,9 +91,10 @@ extern Button m_Play[4];
 extern Button m_Optn[7];
 extern Button m_Ctrl[5];
 extern Button m_Scrn[5];
-extern Button m_Clr[11];
+extern Button m_Clr[12];
 extern Button m_End[3];
 extern Button m_ChatBox[2];
+extern Button m_Slider[8];
 
 
 extern bool isUnitOnOverlay;
@@ -99,6 +103,7 @@ extern bool isResourceOnOverlay;
 
 extern int overrideMouse;
 extern int entOnOverlay;
+extern unsigned RGBA[4];
 
 const int gridX = 10;
 const int gridY = 8;
@@ -108,6 +113,7 @@ extern float xSpace(float num, float den = 100);
 extern float ySpace(float num, float den = 100);
 
 extern unsigned mouseTint;
+extern unsigned customColor;
 
 extern unsigned ui_Text;
 extern unsigned ui_Human;
@@ -143,20 +149,24 @@ extern unsigned ui_Farm;
 #define wi_Steel		getTextureWidth(ui_Resource) * (8 / 3)
 #define hi_Steel		(getTextureHeight(ui_Resource) / 2) * 3
 #define wi_Collector	(getTextureWidth(ui_Collector) / 2) * 3
-#define hi_Collector	getTextureHeight(ui_Collector) * 5 / 3 
+#define hi_Collector	getTextureHeight(ui_Collector) * 5 / 3  
 
+//Returns the index for a given char to be used with the font atlas
 extern int cti(char a);
+//Converts (int)0-9 to (char)0-9
 extern char itc(int a);
+//Converts a font atlas index to a char
 extern char ktc(int index, bool shift);
 
 extern void initUI();
+extern void initRGBA();
 extern void initBuildGrid();
 extern void drawText(const char *string, float x, float y, int multH = 1, int multW = 1, bool drawUp = false, TextAlign ta = RIGHT, unsigned tint = clr_WHITE);
 extern void drawBox(float x, float y, float h, float w, unsigned tint = clr_WHITE);
 extern void drawMouse(unsigned sprite = ui_Text, int index = 49, float h = hi_Text, float w = wi_Text, float multH = 3, float multW = 3);
 extern void drawBuildGrid();
 
-extern int drawMenu(Button *b, int indexLimiter = -1, bool constHighlight = false);
+extern int drawMenu(Button *b, int indexLimiter = -1, bool constHighlight = false, bool makeLeftCarry = false);
 extern int getSelectedColor();
 extern void drawGameOverlay();
 extern void drawSelBox(Button b, unsigned forceTint = clr_NONE);

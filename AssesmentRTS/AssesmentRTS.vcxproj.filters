@@ -48,9 +48,6 @@
     <ClInclude Include="source\core\fileio\fileio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\core\Game\game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Header.h">
       <Filter>Header Files</Filter>
     </ClInclude>

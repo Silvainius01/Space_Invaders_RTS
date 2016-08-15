@@ -875,7 +875,7 @@ void ai_UGU()
 	switch (std::rand() % 4)
 	{
 	case 0:
-		if (unitUpgrades[0] < 4 && p_AI.getSteel() >= 250 && p_AI.getFood() >= 50)
+		if (p_AI.getSteel() >= 250 && p_AI.getFood() >= 50)
 		{
 			p_AI.addSteel(-250);
 			p_AI.addFodd(-50);
@@ -884,7 +884,7 @@ void ai_UGU()
 		}
 		break;
 	case 1:
-		if (unitUpgrades[1] < 6 && p_AI.getSteel() >= 150 && p_AI.getFood() >= 150)
+		if (p_AI.getSteel() >= 150 && p_AI.getFood() >= 150)
 		{
 			p_AI.addSteel(-150);
 			p_AI.addFodd(-150);
@@ -893,16 +893,16 @@ void ai_UGU()
 		}
 		break;
 	case 2:
-		if (unitUpgrades[2] < 2 && p_AI.getSteel() >= 100 && p_AI.getFood() >= 200)
+		if (p_AI.getSteel() >= 100 && p_AI.getFood() >= 200)
 		{
 			p_AI.addSteel(-100);
 			p_AI.addFodd(-200);
-			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAttackSpeed(u_Current.getAttackSpeed() + 5.0f); } }
-			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAttackSpeed(u_AllBase[a].getAttackSpeed() + 5.0f); } }
+			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAttackSpeed(u_Current.getAttackSpeed() - 0.015f); } }
+			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAttackSpeed(u_AllBase[a].getAttackSpeed() - 0.015f); } }
 		}
 		break;
 	case 3:
-		if (unitUpgrades[3] < 4 && p_AI.getSteel() >= 50 && p_AI.getFood() >= 250)
+		if (p_AI.getSteel() >= 50 && p_AI.getFood() >= 250)
 		{
 			p_AI.addSteel(-50);
 			p_AI.addFodd(-250);
@@ -950,7 +950,7 @@ void ai_Run(float updateTime)
 		if (canBuildBarracks) { ai_PB(); }
 		else if (canBuildTower) { ai_PT(); }
 
-		cout << "Money: " << money << "\nFood: " << food << "\nSteel: " << steel << endl;
+		//cout << "Money: " << money << "\nFood: " << food << "\nSteel: " << steel << endl;
 		for (int a = 0; a < unitSpawnIndex; a++) { u_Current.groupFlag = false; }
 		tmr_Update = 0.0f;
 	}

@@ -227,6 +227,8 @@ public:
 		if (u.getID() != this->getID()) { return true; }
 		else { return false; }
 	}
+
+	operator int() const{ return unitID; }
 };
 const int unitIndex = 6;
 extern int unitSpawnIndex;

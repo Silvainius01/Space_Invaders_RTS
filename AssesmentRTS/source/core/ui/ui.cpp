@@ -27,6 +27,7 @@ unsigned ui_Resource;
 unsigned ui_Collector;
 unsigned ui_Farm;
 unsigned mouseTint = clr_CYAN;
+unsigned RGBA[4] = { 0x00, 0x00, 0x00, 0xFF };
 
 float xSpace(float num, float den) { return (SCREEN[0] / den) * num; }
 float ySpace(float num, float den) { return (SCREEN[1] / den) * num; }
@@ -74,6 +75,7 @@ char itc(int a)
 	case 0: return '0';
 	}
 }
+
 char ktc(int index, bool shift)
 {
 	switch (index)
@@ -238,6 +240,7 @@ int cti(char a)
 	case '0': return 61;
 	case ':': return 62;
 	case '\n': return -2;
+	case '\0': return -3;
 	default: return -1;
 	}
 }
@@ -279,6 +282,7 @@ void drawText(const char *string, float x, float y, const int multH, const int m
 		CTI = cti(string[a]);
 		if (a != 0) { x += spc; }
 		if (CTI == -1) { continue; }
+		else if (CTI == -3) { break; }
 		else if (CTI == -2 || a == 0)
 		{
 			int index = a;

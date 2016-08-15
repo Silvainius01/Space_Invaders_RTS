@@ -10,6 +10,7 @@
 #define KEY_O 79
 #define KEY_P 80
 #define KEY_R 82
+#define KEY_S 83
 #define KEY_T 84
 #define KEY_U 85
 #define KEY_LSHIFT 340
@@ -29,4 +30,5 @@ extern float tmr_DoubleClick;
 
 extern int checkBindings(bool retShf = false, bool carry = false);
 extern int checkKeys();
+extern int checkHotKeys();
 extern int checkMouse(bool doesLeftCarry = true);

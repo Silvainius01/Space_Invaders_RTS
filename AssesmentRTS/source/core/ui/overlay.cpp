@@ -57,6 +57,7 @@ Button m_PlyrOverlay[] = {  Button("Money:", xSpace(5), ySpace(14), 2, 2, clr_WH
 
 void drawGameOverlay()
 {
+	int key = checkHotKeys();
 	drawTexture(ui_Overlay, xSpace(50), ySpace(50), xSpace(1, 1), ySpace(1, 1));
 	m_EntOverlay[6].setTint(playerColor);
 	m_EntOverlay[6].setName(profileName);
@@ -91,7 +92,7 @@ void drawGameOverlay()
 			m_EntOverlay[9].setName("Units");
 			m_EntOverlay[10].setName("Buildings");
 		}
-		m_EntOverlay[11].setName('\0');
+		m_EntOverlay[11].setName("");
 		switch (u_EntOnOverlay.getTarget())
 		{
 		case NOTHING:
@@ -176,13 +177,15 @@ void drawGameOverlay()
 		drawTexture(b_EntOnOverlay.getSprite(), xSpace(50), ySpace(11), pd.w, pd.h, 0, true, b_AllDynam[entOnOverlay].getSpriteIndex());
 		m_EntOverlay[0].setName(b_EntOnOverlay.getName());
 		m_EntOverlay[2].setName(hp);
+		if (train[0] == NULL) { train[0] = '0'; }
+		if (train[1] == NULL) { train[1] = '0'; }
 		if (b_EntOnOverlay == b_HumanTower || b_EntOnOverlay == b_InvaderTower) { m_EntOverlay[4].setName(dmg); }
 		else { m_EntOverlay[4].setName("NV"); }
 		if (b_EntOnOverlay.getOwner() == 1) { m_EntOverlay[6].setName("Invaders"); m_EntOverlay[6].setTint(p_AI.getPlayerColor()); }
 		else { m_EntOverlay[6].setTint(playerColor); m_EntOverlay[6].setName(profileName); }
 		if (b_EntOnOverlay == b_HumanBarracks || b_EntOnOverlay == b_InvaderBarracks)
 		{
-			char *cnt;
+			char *cnt = "0";
 			int count = 0;
 			for (int a = 0; a < b_EntOnOverlay.getMaxQueue(); a++) { if (b_EntOnOverlay.queue[a] != -1) { count++; } }
 			switch (count)
@@ -197,7 +200,6 @@ void drawGameOverlay()
 			case 8: cnt = "8"; break;
 			case 9: cnt = "9"; break;
 			case 10: cnt = "10"; break;
-			default: cnt = "0"; break;
 			}
 			m_EntOverlay[7].setName("Train:");
 			m_EntOverlay[8].setName("Soldier");
@@ -209,9 +211,10 @@ void drawGameOverlay()
 			m_EntOverlay[11].setName(train);
 			m_EntOverlay[11].setXPos(m_EntOverlay[10].getXPos() + ((strlen(m_EntOverlay[10].getName()) + 1) * 9 * 3));
 			m_EntOverlay[12].setXPos(m_EntOverlay[11].getXPos() + (strlen(m_EntOverlay[11].getName()) * 9));
+			m_EntOverlay[12].setName(" percent");
 			m_EntOverlay[13].setName("Collector");
 			m_EntOverlay[13].setXPos(m_EntOverlay[8].getXPos() + ((strlen(m_EntOverlay[8].getName()) - 1) * 9 * 3));
-			m_EntOverlay[14].setName("\0");
+			m_EntOverlay[14].setName("");
 		}
 		else if (b_EntOnOverlay == b_HumanTC)
 		{
@@ -273,20 +276,15 @@ void drawGameOverlay()
 			m_EntOverlay[12].setTint(clr_RED);
 			m_EntOverlay[12].setXPos(m_EntOverlay[11].getXPos() + ((strlen(m_EntOverlay[11].getName())) * 9 * 3));
 		}
-		else { m_EntOverlay[7].setName('\0'); }
+		else { m_EntOverlay[7].setName(""); }
 		switch (drawMenu(m_EntOverlay))
 		{
 		case 8:
-			
 			if (b_EntOnOverlay == b_HumanBarracks)
 			{
 				for (int a = 0; a < buildSpawnIndex; a++)
-				{
 					if (b_Current == b_HumanBarracks && b_Current.getSelected())
-					{
 						addToQueue(u_Human, b_Current);
-					}
-				}
 			}
 			else if (b_EntOnOverlay == b_HumanTC)
 			{
@@ -295,13 +293,11 @@ void drawGameOverlay()
 					p_Player.addSteel(-150);
 					p_Player.addFodd(-150);
 					for (int a = 0; a < unitSpawnIndex; a++)
-					{
-						if (u_Current.getOwner() == 0) { u_Current.setAtkRad(u_Current.getAtkRad() + 5.0f); }
-					}
+						if (u_Current.getOwner() == 0) 
+							u_Current.setAtkRad(u_Current.getAtkRad() + 5.0f);
 					for (int a = 0; a < unitIndex; a++)
-					{
-						if (u_AllBase[a].getOwner() == 0) { u_AllBase[a].setAtkRad(u_AllBase[a].getAtkRad() + 5.0f); }
-					}
+						if (u_AllBase[a].getOwner() == 0) 
+							u_AllBase[a].setAtkRad(u_AllBase[a].getAtkRad() + 5.0f);
 				}
 			}
 			else if (b_EntOnOverlay == b_HumanTower)
@@ -333,13 +329,11 @@ void drawGameOverlay()
 					p_Player.addSteel(-250);
 					p_Player.addFodd(-50);
 					for (int a = 0; a < unitSpawnIndex; a++)
-					{
-						if (u_Current.getOwner() == 0) { u_Current.setDMG(u_Current.getDMG() + 2); }
-					}
+						if (u_Current.getOwner() == 0) 
+							u_Current.setDMG(u_Current.getDMG() + 2);
 					for (int a = 0; a < unitIndex; a++)
-					{
-						if (u_AllBase[a].getOwner() == 0) { u_AllBase[a].setDMG(u_AllBase[a].getDMG() + 2); }
-					}
+						if (u_AllBase[a].getOwner() == 0) 
+							u_AllBase[a].setDMG(u_AllBase[a].getDMG() + 2);
 				}
 			}
 			else if (b_EntOnOverlay == b_HumanTower)
@@ -415,24 +409,34 @@ void drawGameOverlay()
 					p_Player.addSteel(-50);
 					p_Player.addFodd(-250);
 					for (int a = 0; a < unitIndex; a++)
-					{
-						if (u_AllBase[a].getOwner() == 0) { u_AllBase[a].setHP(u_AllBase[a].getHP() + 5); }
-					}
+						if (u_AllBase[a].getOwner() == 0) 
+							u_AllBase[a].setHP(u_AllBase[a].getHP() + 5);
 				}
-				
 			}
 		default:
 			break;
 		}
-		if (b_EntOnOverlay == b_HumanBarracks && getKey('S'))
+
+		switch (b_EntOnOverlay.getID())
 		{
-			for (int a = 0; a < buildSpawnIndex; a++)
+		case 0: //Town Center Hotkeys
+			break;
+		case 1: //Tower HotKeys
+			break;
+		case 2: //Barrack HotKeys
+			if (key == KEY_S)
 			{
-				if (b_Current == b_HumanBarracks && b_Current.getSelected())
-				{
-					addToQueue(u_Human, b_Current);
-				}
+				for (int a = 0; a < buildSpawnIndex; a++)
+					if (b_Current == b_HumanBarracks && b_Current.getSelected())
+						addToQueue(u_Human, b_Current);
 			}
+			else if (key == KEY_C)
+			{
+				for (int a = 0; a < buildSpawnIndex; a++)
+					if (b_Current == b_HumanBarracks && b_Current.getSelected())
+						addToQueue(u_HumanCollector, b_Current);
+			}
+			break;
 		}
 	}
 	else if (isResourceOnOverlay)
@@ -443,7 +447,7 @@ void drawGameOverlay()
 		m_EntOverlay[1].setName("Amount Left:");
 		m_EntOverlay[4].setName(hp); 
 		m_EntOverlay[3].setName(" "); m_EntOverlay[2].setName(" ");
-		m_EntOverlay[5].setName('\0');
+		m_EntOverlay[5].setName("");
 		PosDim pd = r_EntOnOverlay.getPosDim();
 		switch (r_EntOnOverlay.getID())
 		{

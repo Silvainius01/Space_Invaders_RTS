@@ -127,7 +127,6 @@
     <ClInclude Include="Header.h" />
     <ClInclude Include="source\core\ent\ent.h" />
     <ClInclude Include="source\core\fileio\fileio.h" />
-    <ClInclude Include="source\core\Game\game.h" />
     <ClInclude Include="source\core\libraries\sfwdraw.h" />
     <ClInclude Include="source\core\math.h" />
     <ClInclude Include="source\core\ui\input.h" />
