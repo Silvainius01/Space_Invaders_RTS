@@ -633,7 +633,7 @@ void ai_PT()
 				if (ai_bg[a][b] == 2 || ai_bg[a][b] == 0)
 				{
 
-					cout << "rand = " << rand << endl;
+					//cout << "rand = " << rand << endl;
 
 					if (rand < towers / 2.5 && !built)
 					{
@@ -641,7 +641,8 @@ void ai_PT()
 						spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x] * 10 + 5 + variate), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate));
 						built = true;
 						p_AI.addMoney(-b_InvaderTower.getCost());
-						cout << "Built at: (" << xSpace(buildGrid[y][x] * 10 + 5 + variate) << ", " << ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate) << ")\n";
+						//cout << "Built at: (" << xSpace(buildGrid[y][x] * 10 + 5 + variate) << ", " << ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate) << ")\n";
+						cout << "Built Tower";
 					}
 					else
 					{
@@ -668,14 +669,15 @@ void ai_PT()
 				if (ai_bg[a][b] == 2 || ai_bg[a][b] == 0)
 				{
 
-					cout << "rand = " << rand << endl;
+					//cout << "rand = " << rand << endl;
 
 					if (rand < towers / 4 && !built)
 					{
 						spawnBuild(b_InvaderTower, xSpace(buildGrid[y][x] * 10 + 5 + variate), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate));
 						built = true;
 						p_AI.addMoney(-b_InvaderTower.getCost());
-						cout << "Built at: (" << xSpace(buildGrid[y][x] * 10 + 5 + variate) << ", " << ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate) << ")\n";
+						//cout << "Built at: (" << xSpace(buildGrid[y][x] * 10 + 5 + variate) << ", " << ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 5 - variate) << ")\n";
+						cout << "Built Tower";
 					}
 					else
 					{
@@ -694,6 +696,7 @@ void ai_PB()
 {
 	bool ud = std::rand() % 2;
 
+	// Randomly choose to start from the bottom-left or top-right of the build grid
 	if (ud)
 	{
 		for (int a = 0; a < gridY; a++)
@@ -707,6 +710,7 @@ void ai_PB()
 				{
 					spawnBuild(b_InvaderBarracks, xSpace(buildGrid[y][x] * 10 + 5), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 7));
 					p_AI.addMoney(-b_InvaderBarracks.getCost());
+					cout << "Built Barracks";
 					return;
 				}
 			}
@@ -725,6 +729,7 @@ void ai_PB()
 				{
 					spawnBuild(b_InvaderBarracks, xSpace(buildGrid[y][x] * 10 + 5), ySpace((buildGrid[y + 1][x] + y + 3 - x) * 10 - 7));
 					p_AI.addMoney(-b_InvaderBarracks.getCost());
+					cout << "Built Barracks";
 					return;
 				}
 			}
@@ -880,7 +885,8 @@ void ai_UGU()
 			p_AI.addSteel(-250);
 			p_AI.addFodd(-50);
 			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setDMG(u_Current.getDMG() + 2); } }
-			for (int a = 0; a < unitIndex;		a++) { if (u_Current.getOwner() == 1) { u_Current.setDMG(u_Current.getDMG() + 2); } }
+			for (int a = 0; a < unitIndex;		a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setDMG(u_AllBase[a].getDMG() + 2); } }
+			cout << "Upgraded Unit Damage";
 		}
 		break;
 	case 1:
@@ -890,6 +896,7 @@ void ai_UGU()
 			p_AI.addFodd(-150);
 			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAtkRad(u_Current.getAtkRad() + 5.0f); } }
 			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAtkRad(u_AllBase[a].getAtkRad() + 5.0f); } }
+			cout << "Upgraded Unit Attack Range";
 		}
 		break;
 	case 2:
@@ -899,6 +906,7 @@ void ai_UGU()
 			p_AI.addFodd(-200);
 			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setAttackSpeed(u_Current.getAttackSpeed() - 0.015f); } }
 			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setAttackSpeed(u_AllBase[a].getAttackSpeed() - 0.015f); } }
+			cout << "Upgraded Unit Attack Speed";
 		}
 		break;
 	case 3:
@@ -908,6 +916,7 @@ void ai_UGU()
 			p_AI.addFodd(-250);
 			for (int a = 0; a < unitSpawnIndex; a++) { if (u_Current.getOwner() == 1) { u_Current.setHP(u_Current.getHP() + 5); } }
 			for (int a = 0; a < unitIndex; a++) { if (u_AllBase[a].getOwner() == 1) { u_AllBase[a].setHP(u_AllBase[a].getHP() + 5); } }
+			cout << "Upgraded Unit Health";
 		}
 		break;
 	}
@@ -918,7 +927,49 @@ void ai_UGU()
 //determines upgrades for buildings
 void ai_UGB()
 {
-
+	switch (std::rand() % 3)
+	{
+	case 0:
+		if (p_AI.getSteel() >= 250 && p_AI.getFood() >= 50)
+		{
+			p_AI.addSteel(-250);
+			p_AI.addFodd(-50);
+			for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current.getOwner() == 1) { b_Current.setDMG(b_Current.getDMG() + 10); } }
+			for (int a = 0; a < buildingIndex; a++) { if (b_AllBase[a].getOwner() == 1) { b_AllBase[a].setDMG(b_AllBase[a].getDMG() + 10); } }
+			cout << "Upgraded Building Damage";
+		}
+		break;
+	case 1:
+		if (p_AI.getSteel() >= 150 && p_AI.getFood() >= 150)
+		{
+			p_AI.addSteel(-150);
+			p_AI.addFodd(-150);
+			for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current.getOwner() == 1) { b_Current.setAtkRad(b_Current.getAtkRad() + 10.0f); } }
+			for (int a = 0; a < buildingIndex; a++) { if (b_AllBase[a].getOwner() == 1) { b_AllBase[a].setAtkRad(b_AllBase[a].getAtkRad() + 10.0f); } }
+			cout << "Upgraded Building Attack Range\n";
+		}
+		break;
+	case 2:
+		if (p_AI.getSteel() >= 100 && p_AI.getFood() >= 200)
+		{
+			p_AI.addSteel(-100);
+			p_AI.addFodd(-200);
+			for (int a = 0; a < buildSpawnIndex; a++) { if (b_Current.getOwner() == 1) { b_Current.setAtkSpeed(b_Current.getAtkSpeed() - 0.25f); } }
+			for (int a = 0; a < buildingIndex; a++) { if (b_AllBase[a].getOwner() == 1) { b_AllBase[a].setAtkSpeed(b_AllBase[a].getAtkSpeed() - 0.25f); } }
+			cout << "Upgraded Building Attack Speed\n";
+		}
+		break;
+	/*case 3:
+		if (p_AI.getSteel() >= 50 && p_AI.getFood() >= 250)
+		{
+			p_AI.addSteel(-50);
+			p_AI.addFodd(-250);
+			for (int a = 0; a < unitSpawnIndex; a++) { if (b_Current.getOwner() == 1) { b_Current.setHP(b_Current.getHP() + 5); } }
+			for (int a = 0; a < buildingIndex; a++) { if (b_AllBase[a].getOwner() == 1) { b_AllBase[a].setHP(b_AllBase[a].getHP() + 5); } }
+			cout << "Upgraded Building Health";
+		}
+		break;*/
+	}
 }
 
 void ai_Run(float updateTime)
@@ -942,15 +993,23 @@ void ai_Run(float updateTime)
 		foodNodes = ai_CFC();
 		steelNodes = ai_CSC();
 
+		cout << "\n\nMoney: " << money << "\nFood: " << food << "\nSteel: " << steel << endl;
+
 		if (!firstRun)
-			ai_UCU(), ai_UGU();
+		{
+			ai_UCU();
+
+			// 50/50 to upgrade units or buildings
+			if (std::rand() % 2 == 0)
+				ai_UGU();
+			else ai_UGB();
+		}
 
 		ai_UU();
 		ai_CBS();
 		if (canBuildBarracks) { ai_PB(); }
 		else if (canBuildTower) { ai_PT(); }
 
-		//cout << "Money: " << money << "\nFood: " << food << "\nSteel: " << steel << endl;
 		for (int a = 0; a < unitSpawnIndex; a++) { u_Current.groupFlag = false; }
 		tmr_Update = 0.0f;
 	}

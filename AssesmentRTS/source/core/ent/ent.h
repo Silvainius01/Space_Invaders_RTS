@@ -249,7 +249,7 @@ extern Unit *u_AllDynam;
 class Building : public Entity
 {
 private:
-	int maxQueue, buildingID;
+	int maxQueue = 10, buildingID;
 	float atkRad, saveTrainTime = 0, baseTrainTime = 3.0f, currentTrainTime = 3.0f;
 	float atkSpeed, lstAtk = 0.0f;
 public:
@@ -291,6 +291,7 @@ public:
 		setAtkSpeed(atkSpd);
 		setCost(cost);
 		setOwner(ownerIndex);
+		setMaxQueue(1);
 	}
 
 	Building &operator=(Building &b)
