@@ -19,6 +19,8 @@ class Brain
 	bool firstRun = true;
 	bool targetingBuilds = false;
 
+	Player player;
+
 	int state = 0;
 	int tempCount = 0;
 	int money;
@@ -46,6 +48,27 @@ class Brain
 
 	float ai_TimerStart = 0.0f;
 	float tmr_Update = ai_TimerStart;
+
+
+	void updateUnitCounts()
+	{
+		playerUnits = ai_CPU();
+		playerUnitsAttackingBuilds = ai_CPUNB();
+		playerUnitsAttackingUnits = ai_CPUAU();
+		units = ai_CU();
+		idleUnits = ai_CUDT(IDLE);
+		unitAttackers = ai_CUDT(FIGHT_UNITS);
+		barracks = ai_CB();
+		collectors = ai_CC();
+		foodNodes = ai_CFC();
+		steelNodes = ai_CSC();
+
+		for (int a = 0; a < unitSpawnIndex; a++)
+		{
+			if (u_Current.getOwner() == player.getPlayerID())
+				++playerUnits;
+		}
+	}
 
 	//Counts all AI units
 	int ai_CU()
@@ -972,10 +995,9 @@ class Brain
 		}
 	}
 
+	public:
 	void ai_Run(float updateTime)
 	{
-
-
 		if (tmr_Update >= updateTime)
 		{
 			money = p_AI.getMoney();
@@ -1016,5 +1038,12 @@ class Brain
 		else { tmr_Update += getDeltaTime(); }
 	}
 };
+
+Brain b = Brain();
+
+void ai_Run(float updateTime)
+{
+	b.ai_Run(updateTime);
+}
 
 

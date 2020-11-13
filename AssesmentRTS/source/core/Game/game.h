@@ -32,6 +32,7 @@ public:
 		setPlayerColor(color);
 	}
 };
+
 const int playerIndex = 3;
 extern Player p_AllBase[playerIndex];
 #define p_Player p_AllBase[0]

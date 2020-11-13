@@ -37,6 +37,12 @@ enum Target
 	BUILDINGS = 4
 };
 
+enum UnitType
+{
+	Fighter=0,
+	Collector=1
+};
+
 class Entity
 {
 protected:
@@ -77,6 +83,18 @@ extern int rotation;
 #define getW getPosDim().w
 #define getPos { getX, getY, -1, -1 }
 #define getDim { -1, -1, getH, getW }
+
+class OffensiveEntity : public Entity
+{
+private:
+	int u_Target = -1;
+	int b_Target = -1;
+	int r_Target = -1;
+	Entity target;
+	float atkSpeed, atkRad, lastAtk = 0.0f;
+	bool hasTarget = false, isUnitTarget = true, isFoodTarget = false, targetInRange = false;
+public:
+};
 
 class Unit : public Entity
 {
